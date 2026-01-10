@@ -88,7 +88,9 @@
 
 <!-- النموذج المخفي -->
 <form id="uploadForm" style="display:none; margin-top:20px;">
-  <input type="file" id="fileInput" accept=".jpg,.png,.pdf,.zip" multiple>
+  <input type="file" id="fileInput" accept=".jpg,.png,.pdf,.zip" multiple> 
+<br><br>
+<input type="file" id="previewImage" accept=".jpg,.png" required>
   <br><br>
   <input type="text" id="productName" placeholder="Product Name" required>
   <br><br>
@@ -132,6 +134,10 @@ formData.append('name', name);
 formData.append('desc', desc);
 formData.append('type', document.getElementById('productType').value);
 formData.append('price', document.getElementById('productPrice').value);
+formData.append(
+  'preview',
+  document.getElementById('previewImage').files[0]
+);
 
 for (let i = 0; i < files.length; i++) {
   formData.append('files', files[i]);
@@ -160,3 +166,4 @@ fetch('https://backend-creovea.onrender.com/upload', {
 
 </body>
 </html>
+
