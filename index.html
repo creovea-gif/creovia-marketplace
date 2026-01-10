@@ -124,21 +124,23 @@ uploadForm.addEventListener('submit', (e) => {
   }
 
   fetch('https://backend-creovea.onrender.com/upload', {
-    method: 'POST',
-    body: formData
-  })
-    .then(res => res.json())
-    .then(data => {
-      alert(data.message);
-      uploadForm.reset();
-      uploadForm.style.display = 'none';
-      loadProducts(); // تحديث تلقائي
-    })
-    .catch(err => {
-      console.error(err);
-      alert('Upload failed');
-    });
+  method: 'POST',
+  body: formData
+})
+.then(res => res.json())
+.then(data => {
+  alert(data.message);
+  uploadForm.reset();
+  uploadForm.style.display = 'none';
+  loadProducts();
+})
+.catch(err => {
+  console.error(err);
+  alert('Upload failed');
 });
+
+}); // ← هذا السطر كان ناقص ❗
+
 
 /* ===== تحميل المنتجات ===== */
 function loadProducts() {
@@ -178,6 +180,7 @@ loadProducts();
 
 </body>
 </html>
+
 
 
 
