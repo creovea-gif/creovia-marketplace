@@ -4,199 +4,113 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CREOVIA - Digital Marketplace</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
 <style>
-  * { box-sizing: border-box; margin:0; padding:0; font-family:'Poppins', sans-serif;}
-  body { background:#f5f5f5; color:#111; }
-  header { background:#6C4BFF; color:white; padding:20px; }
-  header h1 { font-size:2rem; }
-  nav { margin-top:10px; }
-  nav a { color:white; margin-right:15px; text-decoration:none; font-weight:600; }
-  nav a:hover { text-decoration:underline; }
-
-  .hero { text-align:center; padding:60px 20px; background: linear-gradient(135deg,#6C4BFF,#8F63FF); color:white; border-radius:0 0 50% 50%/0 0 10% 10%; }
-  .hero h2 { font-size:2.2rem; margin-bottom:15px; }
-  .hero p { font-size:1.1rem; opacity:0.9; }
-
-  main { padding:40px 20px; max-width:1200px; margin:auto; }
-  .section-title { font-size:1.8rem; margin-bottom:20px; font-weight:700; text-align:center; color:#0F172A; }
-
-  .products { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:25px; }
-  .product-card { background:white; border-radius:15px; padding:20px; box-shadow:0 4px 12px rgba(0,0,0,0.08); transition:transform 0.2s; text-align:center; }
-  .product-card:hover { transform:translateY(-8px); }
-  .product-card img { width:100%; height:180px; object-fit:contain; margin-bottom:15px; }
-  .product-card h3 { font-size:1.2rem; margin-bottom:10px; }
-  .product-card p { font-size:0.95rem; color:#555; margin-bottom:15px; }
-  .product-card button { background:#6C4BFF; color:white; border:none; padding:10px 15px; border-radius:10px; cursor:pointer; font-weight:600; transition:background 0.2s; }
-  .product-card button:hover { background:#5438c1; }
-
-  .upload-section { margin-top:60px; background:#fff; padding:40px 20px; border-radius:20px; text-align:center; box-shadow:0 4px 12px rgba(0,0,0,0.05);}
-  .upload-section h2 { font-size:1.8rem; margin-bottom:15px; color:#0F172A;}
-  .upload-section p { font-size:1rem; color:#555; margin-bottom:25px; }
-  .upload-section button { background:#FF6B6B; color:white; border:none; padding:12px 20px; border-radius:12px; cursor:pointer; font-weight:600; transition:background 0.2s;}
-  .upload-section button:hover { background:#e04e4e; }
-
-  footer { margin-top:60px; padding:25px; text-align:center; background:#0F172A; color:white; }
-  @media(max-width:600px){ .hero h2{font-size:1.6rem;} .hero p{font-size:1rem;} .section-title{font-size:1.5rem;} }
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Poppins',sans-serif}
+body{background:#f5f5f5;color:#111}
+header{background:#6C4BFF;color:#fff;padding:20px}
+nav a{color:#fff;margin-right:15px;text-decoration:none;font-weight:600}
+.hero{text-align:center;padding:60px 20px;background:linear-gradient(135deg,#6C4BFF,#8F63FF);color:#fff}
+main{padding:40px 20px;max-width:1200px;margin:auto}
+.products{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:25px}
+.product-card{background:#fff;border-radius:15px;padding:20px;text-align:center}
+.upload-section{margin-top:60px;background:#fff;padding:40px;border-radius:20px;text-align:center}
+.upload-section input,select,textarea{width:100%;max-width:400px;padding:10px;margin:8px auto;border-radius:8px;border:1px solid #ccc}
+button{background:#6C4BFF;color:#fff;border:none;padding:12px 20px;border-radius:10px;cursor:pointer}
+footer{text-align:center;padding:20px;background:#0F172A;color:#fff;margin-top:50px}
 </style>
 </head>
+
 <body>
 
 <header>
   <h1>CREOVIA</h1>
-  <nav>
-    <a href="#">Home</a>
-    <a href="#">Categories</a>
-    <a href="#">Upload</a>
-    <a href="#">Dashboard</a>
-    <a href="#">Contact</a>
-  </nav>
 </header>
 
 <section class="hero">
   <h2>Sell and Buy Digital Products Easily</h2>
-  <p>Ebooks, templates, logos, magazines, and more—all in one marketplace.</p>
+  <p>Ebooks, templates, logos, magazines, and more.</p>
 </section>
 
 <main>
-  <h2 class="section-title">Featured Products</h2>
-  <section class="products">
-    <div class="product-card">
-      <img src="https://via.placeholder.com/250x180.png?text=Ebook" alt="Ebook">
-      <h3>Ebook Example</h3>
-      <p>Learn amazing skills with this comprehensive ebook.</p>
-      <button>View & Buy</button>
-    </div>
-    <div class="product-card">
-      <img src="https://via.placeholder.com/250x180.png?text=Template" alt="Template">
-      <h3>Template Example</h3>
-      <p>Professional design template ready for your project.</p>
-      <button>View & Buy</button>
-    </div>
-    <div class="product-card">
-      <img src="https://via.placeholder.com/250x180.png?text=Logo" alt="Logo">
-      <h3>Logo Example</h3>
-      <p>High-quality logo to make your brand shine.</p>
-      <button>View & Buy</button>
-    </div>
-  </section>
 
-  <section class="upload-section">
-    <h2>Upload Your Product</h2>
-    <p>Start selling your digital products today. Upload once and earn forever.</p>
-   <button id="uploadBtn">Upload Now</button>
+<section class="upload-section">
+<h2>Upload Your Product</h2>
 
-<!-- النموذج المخفي -->
-<form id="uploadForm" style="display:none; margin-top:20px;">
-  <input type="file" id="fileInput" accept=".jpg,.png,.pdf,.zip" multiple>
-  <br><br>
-uploadForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
+<button id="uploadBtn">Upload Now</button>
 
-  const files = document.getElementById('fileInput').files;
-  const name = document.getElementById('productName').value;
-  const desc = document.getElementById('productDesc').value;
-  const type = document.getElementById('productType').value;
-  const price = document.getElementById('productPrice').value;
+<form id="uploadForm" style="display:none">
 
-  if(files.length === 0 || !type || !price){
-    alert('Please fill all fields and select at least one file.');
-    return;
-  }
+<input type="file" id="fileInput" multiple accept=".jpg,.png,.pdf,.zip" required>
 
-  const formData = new FormData();
-  formData.append('name', name);
-  formData.append('desc', desc);
-  formData.append('type', type);
-  formData.append('price', price);
+<input type="text" id="productName" placeholder="Product Name" required>
 
-  for(let i=0; i<files.length; i++){
-    formData.append('files', files[i]);
-  }
+<textarea id="productDesc" placeholder="Product Description" required></textarea>
 
-  try {
-    const response = await fetch('https://backend-creovea.onrender.com/upload', {
-      method: 'POST',
-      body: formData
-    });
+<select id="productType" required>
+  <option value="">Select Product Type</option>
+  <option value="ebook">Ebook</option>
+  <option value="template">Template</option>
+  <option value="logo">Logo</option>
+  <option value="magazine">Magazine</option>
+</select>
 
-    const result = await response.json();
-    alert(result.message + "\nUploaded URLs:\n" + result.files.join("\n"));
+<input type="number" id="productPrice" placeholder="Price ($)" required>
 
-    uploadForm.reset();
-    uploadForm.style.display = 'none';
-  } catch(err){
-    alert('Error uploading product!');
-    console.error(err);
-  }
-});
+<button type="submit">Submit Product</button>
 
-
-  <br><br>
-  <button type="submit">Submit Product</button>
 </form>
+</section>
 
-  </section>
 </main>
 
 <footer>
-  &copy; 2026 CREOVIA. All rights reserved.
+&copy; 2026 CREOVIA
 </footer>
-<script>
-  const uploadBtn = document.getElementById('uploadBtn');
-  const uploadForm = document.getElementById('uploadForm');
 
-  uploadBtn.addEventListener('click', () => {
-    uploadForm.style.display = uploadForm.style.display === 'none' ? 'block' : 'none';
-  });
+<script>
+const uploadBtn = document.getElementById('uploadBtn');
+const uploadForm = document.getElementById('uploadForm');
+
+uploadBtn.onclick = () => {
+  uploadForm.style.display =
+    uploadForm.style.display === 'none' ? 'block' : 'none';
+};
 
 uploadForm.addEventListener('submit', async (e) => {
   e.preventDefault();
 
-  const files = document.getElementById('fileInput').files;
-  const name = document.getElementById('productName').value;
-  const desc = document.getElementById('productDesc').value;
-  const type = document.getElementById('productType').value;
-  const price = document.getElementById('productPrice').value;
-
-  if(files.length === 0 || !type || !price){
-    alert('Please fill all fields and select at least one file.');
-    return;
-  }
-
+  const files = fileInput.files;
   const formData = new FormData();
-  formData.append('name', name);
-  formData.append('desc', desc);
-  formData.append('type', type);
-  formData.append('price', price);
 
-  for(let i=0; i<files.length; i++){
+  formData.append('name', productName.value);
+  formData.append('desc', productDesc.value);
+  formData.append('type', productType.value);
+  formData.append('price', productPrice.value);
+
+  for (let i = 0; i < files.length; i++) {
     formData.append('files', files[i]);
   }
 
   try {
-    const response = await fetch('https://backend-creovea.onrender.com/upload', {
+    const res = await fetch('https://backend-creovea.onrender.com/upload', {
       method: 'POST',
       body: formData
     });
 
-    const result = await response.json();
-    alert(result.message + "\nUploaded URLs:\n" + result.files.join("\n"));
+    const data = await res.json();
+    alert(data.message);
 
     uploadForm.reset();
     uploadForm.style.display = 'none';
-  } catch(err){
-    alert('Error uploading product!');
+  } catch (err) {
+    alert('Upload failed');
     console.error(err);
   }
 });
-
 </script>
 
 </body>
 </html>
-
-
-
-
-
