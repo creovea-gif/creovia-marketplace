@@ -30,10 +30,10 @@
   .product-card button { background:#6C4BFF; color:white; border:none; padding:10px 15px; border-radius:10px; cursor:pointer; font-weight:600; transition:background 0.2s; }
   .product-card button:hover { background:#5438c1; }
 
-  .upload-section { margin-top:60px; background:#fff; padding:40px 20px; border-radius:20px; text-align:center; box-shadow:0 4px 12px rgba(0,0,0,0.05);}
-  .upload-section h2 { font-size:1.8rem; margin-bottom:15px; color:#0F172A;}
+  .upload-section { margin-top:60px; background:#fff; padding:40px 20px; border-radius:20px; text-align:center; box-shadow:0 4px 12px rgba(0,0,0,0.05); }
+  .upload-section h2 { font-size:1.8rem; margin-bottom:15px; color:#0F172A; }
   .upload-section p { font-size:1rem; color:#555; margin-bottom:25px; }
-  .upload-section button { background:#FF6B6B; color:white; border:none; padding:12px 20px; border-radius:12px; cursor:pointer; font-weight:600; transition:background 0.2s;}
+  .upload-section button { background:#FF6B6B; color:white; border:none; padding:12px 20px; border-radius:12px; cursor:pointer; font-weight:600; transition:background 0.2s; }
   .upload-section button:hover { background:#e04e4e; }
 
   footer { margin-top:60px; padding:25px; text-align:center; background:#0F172A; color:white; }
@@ -60,49 +60,32 @@
 
 <main>
   <h2 class="section-title">Featured Products</h2>
-  <section class="products">
-    <div class="product-card">
-      <img src="https://via.placeholder.com/250x180.png?text=Ebook" alt="Ebook">
-      <h3>Ebook Example</h3>
-      <p>Learn amazing skills with this comprehensive ebook.</p>
-      <button>View & Buy</button>
-    </div>
-    <div class="product-card">
-      <img src="https://via.placeholder.com/250x180.png?text=Template" alt="Template">
-      <h3>Template Example</h3>
-      <p>Professional design template ready for your project.</p>
-      <button>View & Buy</button>
-    </div>
-    <div class="product-card">
-      <img src="https://via.placeholder.com/250x180.png?text=Logo" alt="Logo">
-      <h3>Logo Example</h3>
-      <p>High-quality logo to make your brand shine.</p>
-      <button>View & Buy</button>
-    </div>
+  <section class="products" id="products">
+    <!-- سيتم إضافة المنتجات من Firebase لاحقًا -->
   </section>
 
   <section class="upload-section">
     <h2>Upload Your Product</h2>
     <p>Start selling your digital products today. Upload once and earn forever.</p>
-   <button id="uploadBtn">Upload Now</button>
+    <button id="uploadBtn">Upload Now</button>
 
-<!-- النموذج المخفي -->
-<form id="uploadForm" style="display:none; margin-top:20px;">
-  <input type="file" id="fileInput" accept=".jpg,.png,.pdf,.zip" multiple>
-  <br><br>
-  <input type="text" id="productName" placeholder="Product Name" required>
-  <br><br>
-  <textarea id="productDesc" placeholder="Product Description" required></textarea>
-  <br><br>
-  <button type="submit">Submit Product</button>
-</form>
-
+    <!-- النموذج المخفي -->
+    <form id="uploadForm" style="display:none; margin-top:20px;">
+      <input type="file" id="fileInput" accept=".jpg,.png,.pdf,.zip" multiple required>
+      <br><br>
+      <input type="text" id="productName" placeholder="Product Name" required>
+      <br><br>
+      <textarea id="productDesc" placeholder="Product Description" required></textarea>
+      <br><br>
+      <button type="submit">Submit Product</button>
+    </form>
   </section>
 </main>
 
 <footer>
   &copy; 2026 CREOVIA. All rights reserved.
 </footer>
+
 <script>
   const uploadBtn = document.getElementById('uploadBtn');
   const uploadForm = document.getElementById('uploadForm');
@@ -111,25 +94,36 @@
     uploadForm.style.display = uploadForm.style.display === 'none' ? 'block' : 'none';
   });
 
-  uploadForm.addEventListener('submit', (e) => {
+  uploadForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const files = document.getElementById('fileInput').files;
     const name = document.getElementById('productName').value;
     const desc = document.getElementById('productDesc').value;
 
-    if(files.length === 0) {
+    if(files.length === 0){
       alert('Please select at least one file.');
       return;
     }
 
-    alert(`Product Submitted!\nName: ${name}\nDescription: ${desc}\nFiles: ${files.length} selected`);
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('desc', desc);
+    for(let i=0; i<files.length; i++){
+      formData.append('files', files[i]);
+    }
 
-    // لاحقًا هنا سنربط Cloudinary لرفع الملفات
-    uploadForm.reset();
-    uploadForm.style.display = 'none';
+    try {
+      const response = await fetch('/upload', { method:'POST', body: formData });
+      const result = await response.json();
+      alert(result.message + "\nUploaded URLs:\n" + result.files.join("\n"));
+      uploadForm.reset();
+      uploadForm.style.display = 'none';
+    } catch(err) {
+      alert('Error uploading product!');
+      console.error(err);
+    }
   });
 </script>
 
 </body>
 </html>
-
