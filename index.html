@@ -156,20 +156,28 @@ function loadProducts() {
       }
 
       products.forEach(p => {
-        const card = document.createElement('div');
-        card.className = 'product-card';
-        card.innerHTML = `
-          <img src="${p.previewImage}">
-          <h3>${p.name}</h3>
-          <p>${p.description}</p>
-          <p><strong>Type:</strong> ${p.type}</p>
-          <p><strong>Price:</strong> ${p.price}</p>
-          <a href="${p.files[0]}" target="_blank">
-            <button>Download</button>
-          </a>
-        `;
-        container.appendChild(card);
-      });
+  const card = document.createElement('div');
+  card.className = 'product-card';
+
+  const downloadUrl = p.files[0].replace(
+    '/upload/',
+    '/upload/fl_attachment/'
+  );
+
+  card.innerHTML = `
+    <img src="${p.previewImage}" alt="${p.name}">
+    <h3>${p.name}</h3>
+    <p>${p.description}</p>
+    <p><strong>Type:</strong> ${p.type}</p>
+    <p><strong>Price:</strong> ${p.price}</p>
+    <a href="${downloadUrl}">
+      <button>Download</button>
+    </a>
+  `;
+
+  container.appendChild(card);
+});
+
     })
     .catch(console.error);
 }
@@ -180,6 +188,7 @@ loadProducts();
 
 </body>
 </html>
+
 
 
 
