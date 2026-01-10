@@ -84,13 +84,52 @@
   <section class="upload-section">
     <h2>Upload Your Product</h2>
     <p>Start selling your digital products today. Upload once and earn forever.</p>
-    <button>Upload Now</button>
+   <button id="uploadBtn">Upload Now</button>
+
+<!-- النموذج المخفي -->
+<form id="uploadForm" style="display:none; margin-top:20px;">
+  <input type="file" id="fileInput" accept=".jpg,.png,.pdf,.zip" multiple>
+  <br><br>
+  <input type="text" id="productName" placeholder="Product Name" required>
+  <br><br>
+  <textarea id="productDesc" placeholder="Product Description" required></textarea>
+  <br><br>
+  <button type="submit">Submit Product</button>
+</form>
+
   </section>
 </main>
 
 <footer>
   &copy; 2026 CREOVIA. All rights reserved.
 </footer>
+<script>
+  const uploadBtn = document.getElementById('uploadBtn');
+  const uploadForm = document.getElementById('uploadForm');
+
+  uploadBtn.addEventListener('click', () => {
+    uploadForm.style.display = uploadForm.style.display === 'none' ? 'block' : 'none';
+  });
+
+  uploadForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const files = document.getElementById('fileInput').files;
+    const name = document.getElementById('productName').value;
+    const desc = document.getElementById('productDesc').value;
+
+    if(files.length === 0) {
+      alert('Please select at least one file.');
+      return;
+    }
+
+    alert(`Product Submitted!\nName: ${name}\nDescription: ${desc}\nFiles: ${files.length} selected`);
+
+    // لاحقًا هنا سنربط Cloudinary لرفع الملفات
+    uploadForm.reset();
+    uploadForm.style.display = 'none';
+  });
+</script>
 
 </body>
 </html>
+
