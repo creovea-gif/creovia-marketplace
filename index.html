@@ -121,21 +121,25 @@ service cloud.firestore {
     uploadForm.style.display = uploadForm.style.display === 'none' ? 'block' : 'none';
   });
 
- uploadForm.addEventListener('submit', async (e) => {
+uploadForm.addEventListener('submit', async (e) => {
   e.preventDefault();
 
   const files = document.getElementById('fileInput').files;
   const name = document.getElementById('productName').value;
   const desc = document.getElementById('productDesc').value;
+  const type = document.getElementById('productType').value;
+  const price = document.getElementById('productPrice').value;
 
-  if(files.length === 0){
-    alert('Please select at least one file.');
+  if(files.length === 0 || !type || !price){
+    alert('Please fill all fields and select at least one file.');
     return;
   }
 
   const formData = new FormData();
   formData.append('name', name);
   formData.append('desc', desc);
+  formData.append('type', type);
+  formData.append('price', price);
 
   for(let i=0; i<files.length; i++){
     formData.append('files', files[i]);
@@ -162,5 +166,6 @@ service cloud.firestore {
 
 </body>
 </html>
+
 
 
