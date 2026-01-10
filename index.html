@@ -131,7 +131,15 @@
   <br><br>
   <textarea id="productDesc" placeholder="Product Description" required></textarea>
   <br><br>
-<input type="text" id="productType" placeholder="Product Type (ebook, logo, template)" required>
+<select id="productType" required>
+  <option value="">-- Select Product Type --</option>
+  <option value="ebook">Ebook</option>
+  <option value="template">Template</option>
+  <option value="logo">Logo</option>
+  <option value="magazine">Magazine</option>
+  <!-- يمكنك إضافة أي تصنيفات جديدة لاحقًا -->
+</select>
+
 <br><br>
 <input type="number" id="productPrice" placeholder="Price" required>
 
@@ -239,6 +247,7 @@ loadProducts();
 
 </body>
 </html>
+
 
 
 
