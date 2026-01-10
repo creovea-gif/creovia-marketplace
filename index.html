@@ -150,16 +150,16 @@ fetch('https://backend-creovea.onrender.com/upload', {
 .then(res => res.json())
 .then(data => {
   alert(data.message);
-  uploadForm.reset();
-  uploadForm.style.display = 'none';
-})
+
 .catch(err => {
   console.error(err);
   alert('Upload failed');
 });
 
     // لاحقًا هنا سنربط Cloudinary لرفع الملفات
-  
+  uploadForm.reset();
+  uploadForm.style.display = 'none';
+});
 
  function loadProducts() {
   fetch('https://backend-creovea.onrender.com/products')
@@ -203,6 +203,7 @@ loadProducts();
 
 </body>
 </html>
+
 
 
 
