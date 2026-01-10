@@ -90,9 +90,19 @@
 <form id="uploadForm" style="display:none; margin-top:20px;">
   <input type="file" id="fileInput" accept=".jpg,.png,.pdf,.zip" multiple>
   <br><br>
-  <input type="text" id="productName" placeholder="Product Name" required>
-  <br><br>
-  <textarea id="productDesc" placeholder="Product Description" required></textarea>
+ rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // جميع المستخدمين يمكنهم قراءة المنتجات
+    match /products/{productId} {
+      allow read: if true;  // للجميع
+      allow write: if false; // لا أحد يكتب مباشرة
+    }
+
+  }
+}
+
   <br><br>
   <button type="submit">Submit Product</button>
 </form>
@@ -152,4 +162,5 @@
 
 </body>
 </html>
+
 
