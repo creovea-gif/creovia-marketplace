@@ -159,12 +159,50 @@ fetch('https://backend-creovea.onrender.com/upload', {
 });
 
     // لاحقًا هنا سنربط Cloudinary لرفع الملفات
-    uploadForm.reset();
-    uploadForm.style.display = 'none';
-  });
+  
+
+ function loadProducts() {
+  fetch('https://backend-creovea.onrender.com/products')
+    .then(res => res.json())
+    .then(products => {
+      const container = document.getElementById('productsContainer');
+      container.innerHTML = ''; // مسح القديم
+
+      if (!products.length) {
+        container.innerHTML = '<p>No products yet</p>';
+        return;
+      }
+
+      products.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+
+        card.innerHTML = `
+          <img src="${p.previewImage}" alt="${p.name}">
+          <h3>${p.name}</h3>
+          <p>${p.description}</p>
+          <p><strong>Type:</strong> ${p.type}</p>
+          <p><strong>Price:</strong> $${p.price}</p>
+          <a href="${p.files[0]}" target="_blank">
+            <button>Download</button>
+          </a>
+        `;
+
+        container.appendChild(card);
+      });
+    })
+    .catch(err => {
+      console.error(err);
+    });
+}
+
+// تحميل المنتجات عند فتح الصفحة
+loadProducts();
+
 </script>
 
 </body>
 </html>
+
 
 
