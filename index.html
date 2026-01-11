@@ -178,20 +178,24 @@
   &copy; 2026 CREOVIA. All rights reserved.
 </footer>
 <script>
+/* ================== Upload toggle ================== */
 const uploadBtn = document.getElementById('uploadBtn');
 const uploadForm = document.getElementById('uploadForm');
 
 uploadBtn.addEventListener('click', () => {
   uploadForm.style.display =
-    uploadForm.style.display === 'none' ? 'block' : 'none';
+    uploadForm.style.display === 'none' || uploadForm.style.display === ''
+      ? 'block'
+      : 'none';
 });
 
-uploadForm.addEventListener('submit', (e) => {
+/* ================== Upload product ================== */
+uploadForm.addEventListener('submit', async (e) => {
   e.preventDefault();
 
   const files = document.getElementById('fileInput').files;
-  if (files.length === 0) {
-    alert('Please select at least one file.');
+  if (!files.length) {
+    alert('Please select product files');
     return;
   }
 
@@ -206,71 +210,89 @@ uploadForm.addEventListener('submit', (e) => {
     formData.append('files', files[i]);
   }
 
-  fetch('https://backend-creovea.onrender.com/upload', {
-  method: 'POST',
-  body: formData
-})
-.then(res => res.json())
-.then(data => {
-  alert(data.message);
-  uploadForm.reset();
-  uploadForm.style.display = 'none';
-  loadProducts();
-})
-.catch(err => {
-  console.error(err);
-  alert('Upload failed');
+  try {
+    const res = await fetch('https://backend-creovea.onrender.com/upload', {
+      method: 'POST',
+      body: formData
+    });
+
+    const data = await res.json();
+    alert(data.message || 'Uploaded successfully');
+
+    uploadForm.reset();
+    uploadForm.style.display = 'none';
+    loadProducts();
+
+  } catch (err) {
+    console.error(err);
+    alert('Upload failed');
+  }
 });
 
-}); // ← هذا السطر كان ناقص ❗
+/* ================== Load products ================== */
+let allProducts = [];
 
-
-/* ===== تحميل المنتجات ===== */
-function loadProducts() {
-  fetch('https://backend-creovea.onrender.com/products')
-    .then(res => res.json())
-    .then(products => {
-      const container = document.getElementById('productsContainer');
-      container.innerHTML = '';
-
-      if (!products.length) {
-        container.innerHTML = '<p>No products yet</p>';
-        return;
-      }
-
-      products.forEach(p => {
-  const card = document.createElement('div');
-  card.className = 'product-card';
-
-  const downloadUrl = p.files[0].replace(
-    '/upload/',
-    '/upload/fl_attachment/'
-  );
-
-  card.innerHTML = `
-    <img src="${p.previewImage}" alt="${p.name}">
-    <h3>${p.name}</h3>
-    <p>${p.description}</p>
-    <p><strong>Type:</strong> ${p.type}</p>
-    <p><strong>Price:</strong> ${p.price}</p>
-    <a href="${downloadUrl}">
-      <button>Download</button>
-    </a>
-  `;
-
-  container.appendChild(card);
-});
-
-    })
-    .catch(console.error);
+async function loadProducts() {
+  try {
+    const res = await fetch('https://backend-creovea.onrender.com/products');
+    allProducts = await res.json();
+    renderProducts(allProducts);
+  } catch (err) {
+    console.error(err);
+  }
 }
 
-loadProducts();
+/* ================== Render products ================== */
+function renderProducts(products) {
+  const container = document.getElementById('productsContainer');
+  container.innerHTML = '';
 
+  if (!products.length) {
+    container.innerHTML = '<p>No products found</p>';
+    return;
+  }
+
+  products.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'product-card';
+
+    const downloadUrl = p.files[0].replace(
+      '/upload/',
+      '/upload/fl_attachment/'
+    );
+
+    card.innerHTML = `
+      <img src="${p.previewImage}" alt="${p.name}">
+      <h3>${p.name}</h3>
+      <p>${p.description}</p>
+      <p><strong>Type:</strong> ${p.type}</p>
+      <p><strong>Price:</strong> $${p.price}</p>
+      <a href="${downloadUrl}">
+        <button>Download</button>
+      </a>
+    `;
+
+    container.appendChild(card);
+  });
+}
+
+/* ================== Filter products ================== */
+function filterProducts(type) {
+  if (type === 'all') {
+    renderProducts(allProducts);
+  } else {
+    const filtered = allProducts.filter(p => p.type === type);
+    renderProducts(filtered);
+  }
+}
+
+/* ================== Init ================== */
+loadProducts();
 </script>
 
 </body>
 </html>
+
 
 
 
