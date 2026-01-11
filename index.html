@@ -133,7 +133,8 @@
 
 
 <!-- النموذج المخفي -->
-<form id="uploadForm" style="display:none; margin-top:20px;">
+<form id="uploadForm" enctype="multipart/form-data" style="display:none; margin-top:20px;">
+
   <!-- صورة المعاينة -->
 <div class="upload-box image-box">
   <label>📸 Product Preview Image</label>
@@ -209,9 +210,9 @@ uploadForm.addEventListener('submit', async (e) => {
 }
 
 
-  for (let i = 0; i < files.length; i++) {
-    formData.append('files', files[i]);
-  }
+ Array.from(files).forEach(file => {
+  formData.append('files', file);
+});
 
   try {
   const res = await fetch('https://backend-creovea.onrender.com/upload', {
@@ -304,6 +305,7 @@ loadProducts();
 
 </body>
 </html>
+
 
 
 
