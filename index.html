@@ -204,7 +204,10 @@ uploadForm.addEventListener('submit', async (e) => {
   formData.append('desc', productDesc.value);
   formData.append('type', productType.value);
   formData.append('price', productPrice.value);
+ if (previewImage.files.length > 0) {
   formData.append('preview', previewImage.files[0]);
+}
+
 
   for (let i = 0; i < files.length; i++) {
     formData.append('files', files[i]);
@@ -301,6 +304,7 @@ loadProducts();
 
 </body>
 </html>
+
 
 
 
