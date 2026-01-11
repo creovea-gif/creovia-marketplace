@@ -70,8 +70,6 @@
             margin: 0 auto;
             padding: 0 5%;
         }
-
-        /* منطقة البحث + الفلاتر */
         .search-and-filters {
             display: flex;
             flex-wrap: wrap;
@@ -80,13 +78,11 @@
             gap: 1.2rem 2rem;
             margin: 2.5rem 0 3.5rem;
         }
-
         .search-container {
             position: relative;
             width: 100%;
             max-width: 380px;
         }
-
         #searchInput {
             width: 100%;
             padding: 0.9rem 1rem 0.9rem 3rem;
@@ -95,7 +91,6 @@
             font-size: 1rem;
             background: white;
         }
-
         .search-icon {
             position: absolute;
             left: 1.1rem;
@@ -104,14 +99,12 @@
             color: #9ca3af;
             font-size: 1.3rem;
         }
-
         .filters {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
             gap: 0.6rem;
         }
-
         .filter-btn {
             background: #e5e7eb;
             border: none;
@@ -122,7 +115,6 @@
             font-weight: 500;
             transition: all 0.25s;
         }
-
         .filter-btn.active,
         .filter-btn:hover {
             background: #6d28d9;
@@ -130,7 +122,6 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(109,40,217,0.25);
         }
-
         .products {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(285px, 1fr));
@@ -194,7 +185,6 @@
         .download-btn:hover {
             background: #5b21b6;
         }
-        /* === Upload Section === */
         .upload-section {
             background: white;
             border-radius: 20px;
@@ -289,8 +279,12 @@
             margin-top: 2rem;
             transition: background 0.3s;
         }
-        .submit-btn:hover {
+        .submit-btn:hover:not(:disabled) {
             background: #059669;
+        }
+        .submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
         }
         footer {
             background: #111827;
@@ -350,7 +344,6 @@
             <h2>Upload Your Digital Product</h2>
            
             <form id="uploadForm">
-                <!-- Preview Image Upload Area -->
                 <div class="form-group">
                     <label>Product Preview Image</label>
                     <div class="upload-area" id="previewArea">
@@ -361,7 +354,7 @@
                         <input type="file" id="previewImage" name="preview" accept="image/*" required>
                     </div>
                 </div>
-                <!-- Product File Upload Area -->
+
                 <div class="form-group">
                     <label>Main Product File</label>
                     <div class="upload-area" id="fileArea">
@@ -372,14 +365,17 @@
                         <input type="file" id="fileInput" name="file" required>
                     </div>
                 </div>
+
                 <div class="form-group">
                     <label>Product Name</label>
                     <input type="text" id="productName" placeholder="e.g. Minimalist Logo Pack" required>
                 </div>
+
                 <div class="form-group">
                     <label>Description</label>
                     <textarea id="productDesc" placeholder="Describe your product..." required></textarea>
                 </div>
+
                 <div class="form-group">
                     <label>Category</label>
                     <select id="productType" required>
@@ -390,14 +386,17 @@
                         <option value="logo">Logo</option>
                     </select>
                 </div>
+
                 <div class="form-group">
                     <label>Price (USD)</label>
                     <input type="number" id="productPrice" placeholder="19.99" min="0.99" step="0.01" required>
                 </div>
+
                 <button type="submit" class="submit-btn">Upload Product</button>
             </form>
         </section>
     </main>
+
     <footer>
         <p>© 2026 CREOVIA — All Rights Reserved</p>
     </footer>
@@ -439,9 +438,7 @@
         setupUploadArea('previewArea', 'previewImage', 'previewFileName');
         setupUploadArea('fileArea', 'fileInput', 'mainFileName');
 
-        // ==============================================
-        // المنتجات + البحث + الفلاتر
-        // ==============================================
+        // المنتجات + البحث + الفلاتر (لم يتغير)
         let allProducts = [];
         let currentFilter = 'all';
 
@@ -488,19 +485,14 @@
             const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
             
             let filteredProducts = allProducts;
-
-            // تطبيق الفلتر حسب النوع
             if (currentFilter !== 'all') {
                 filteredProducts = filteredProducts.filter(p => p.type === currentFilter);
             }
-
-            // تطبيق البحث حسب الاسم
             if (searchTerm !== '') {
-                filteredProducts = filteredProducts.filter(p => 
+                filteredProducts = filteredProducts.filter(p =>
                     p.name.toLowerCase().includes(searchTerm)
                 );
             }
-
             renderProducts(filteredProducts);
         }
 
@@ -511,26 +503,40 @@
             updateProductsDisplay();
         }
 
-        // ربط البحث مع التحديث الفوري
         document.getElementById('searchInput').addEventListener('input', updateProductsDisplay);
 
-        // رفع المنتج (لم يتغير)
+        // ==============================================
+        // رفع المنتج مع منع الضغط المتكرر
+        // ==============================================
         document.getElementById('uploadForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+
+            const submitBtn = document.querySelector('.submit-btn');
+            const originalText = submitBtn.textContent;
+
+            // تعطيل الزر وتغيير المظهر أثناء الرفع
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Uploading...";
+            submitBtn.style.opacity = "0.7";
+            submitBtn.style.cursor = "not-allowed";
+
             const formData = new FormData();
-           
+            
             formData.append('preview', document.getElementById('previewImage').files[0]);
             formData.append('file', document.getElementById('fileInput').files[0]);
             formData.append('name', document.getElementById('productName').value.trim());
             formData.append('desc', document.getElementById('productDesc').value.trim());
             formData.append('type', document.getElementById('productType').value);
             formData.append('price', document.getElementById('productPrice').value);
+
             try {
                 const response = await fetch('https://backend-creovea.onrender.com/upload', {
                     method: 'POST',
                     body: formData
                 });
+
                 const result = await response.json();
+
                 if (response.ok) {
                     alert('Product uploaded successfully!');
                     document.getElementById('uploadForm').reset();
@@ -543,10 +549,17 @@
             } catch (error) {
                 alert('Could not connect to server\n' + error.message);
                 console.error(error);
+            } 
+            finally {
+                // إعادة تفعيل الزر في كل الحالات
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+                submitBtn.style.opacity = "1";
+                submitBtn.style.cursor = "pointer";
             }
         });
 
-        // بدء التحميل
+        // بدء تحميل المنتجات
         loadProducts();
     </script>
 </body>
