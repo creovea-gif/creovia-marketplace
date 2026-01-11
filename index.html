@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CREOVIA - Digital Marketplace</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  
+ 
     <style>
         * {
             box-sizing: border-box;
@@ -163,13 +163,23 @@
             border-radius: 999px;
             font-size: 0.9rem;
             font-weight: 500;
-            margin-bottom: 0.8rem;
+            margin-bottom: 0.4rem;
+        }
+        .sales-count {
+            font-size: 0.95rem;
+            color: #7c3aed;
+            font-weight: 600;
+            margin-bottom: 0.6rem;
+            background: rgba(124, 58, 237, 0.1);
+            padding: 0.35rem 0.9rem;
+            border-radius: 999px;
+            display: inline-block;
         }
         .price {
             font-size: 1.45rem;
             font-weight: 700;
             color: #059669;
-            margin: 0.9rem 0;
+            margin: 0.6rem 0 1rem;
         }
         .download-btn {
             background: #6d28d9;
@@ -342,7 +352,7 @@
 
         <section class="upload-section" id="upload-section">
             <h2>Upload Your Digital Product</h2>
-           
+          
             <form id="uploadForm">
                 <div class="form-group">
                     <label>Product Preview Image</label>
@@ -402,7 +412,6 @@
     </footer>
 
     <script>
-        // Upload areas setup (لم يتغير)
         function setupUploadArea(areaId, inputId, nameDisplayId) {
             const area = document.getElementById(areaId);
             const input = document.getElementById(inputId);
@@ -438,7 +447,6 @@
         setupUploadArea('previewArea', 'previewImage', 'previewFileName');
         setupUploadArea('fileArea', 'fileInput', 'mainFileName');
 
-        // المنتجات + البحث + الفلاتر (لم يتغير)
         let allProducts = [];
         let currentFilter = 'all';
 
@@ -466,11 +474,16 @@
                 const card = document.createElement('div');
                 card.className = 'product-card';
                 const downloadUrl = p.fileUrl?.replace('/upload/', '/upload/fl_attachment/') || '#';
+
+                // عدد المبيعات - حالياً ثابت 0، لاحقاً سيأتي من الـ backend
+                const salesCount = p.salesCount || 0;
+
                 card.innerHTML = `
                     <img src="${p.previewImage || 'https://via.placeholder.com/300x225?text=Preview'}" alt="${p.name}">
                     <div class="product-info">
                         <h3>${p.name}</h3>
                         <span class="type-badge">${p.type || 'Unknown'}</span>
+                        <div class="sales-count">Sales: ${salesCount}</div>
                         <div class="price">$${Number(p.price).toFixed(2)}</div>
                         <a href="${downloadUrl}" target="_blank" rel="noopener">
                             <button class="download-btn">Download</button>
@@ -505,23 +518,18 @@
 
         document.getElementById('searchInput').addEventListener('input', updateProductsDisplay);
 
-        // ==============================================
-        // رفع المنتج مع منع الضغط المتكرر
-        // ==============================================
         document.getElementById('uploadForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-
             const submitBtn = document.querySelector('.submit-btn');
             const originalText = submitBtn.textContent;
 
-            // تعطيل الزر وتغيير المظهر أثناء الرفع
             submitBtn.disabled = true;
             submitBtn.textContent = "Uploading...";
             submitBtn.style.opacity = "0.7";
             submitBtn.style.cursor = "not-allowed";
 
             const formData = new FormData();
-            
+           
             formData.append('preview', document.getElementById('previewImage').files[0]);
             formData.append('file', document.getElementById('fileInput').files[0]);
             formData.append('name', document.getElementById('productName').value.trim());
@@ -549,9 +557,7 @@
             } catch (error) {
                 alert('Could not connect to server\n' + error.message);
                 console.error(error);
-            } 
-            finally {
-                // إعادة تفعيل الزر في كل الحالات
+            } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = originalText;
                 submitBtn.style.opacity = "1";
@@ -559,7 +565,6 @@
             }
         });
 
-        // بدء تحميل المنتجات
         loadProducts();
     </script>
 </body>
