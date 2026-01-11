@@ -46,20 +46,21 @@
                 userEmailElement.style.display = "none";
                 logoutBtn.style.display = "none";
                 loginLink.style.display = "inline";
-                // إعادة توجيه إلى صفحة تسجيل الدخول (اختياري - يمكنك إلغاؤه إذا أردت)
-                // window.location.href = "login.html";
             }
         });
 
-        // دالة تسجيل الخروج
-        function handleLogout() {
-            signOut(auth).then(() => {
-                window.location.href = "login.html";
-            }).catch((error) => {
-                console.error("Logout error:", error);
-                alert("حدث خطأ أثناء تسجيل الخروج");
-            });
-        }
+        // دالة تسجيل الخروج (تم التأكد من عملها)
+        window.handleLogout = function() {
+            signOut(auth)
+                .then(() => {
+                    console.log("User signed out successfully");
+                    window.location.href = "login.html";
+                })
+                .catch((error) => {
+                    console.error("Logout error:", error);
+                    alert("حدث خطأ أثناء تسجيل الخروج: " + error.message);
+                });
+        };
     </script>
 
     <style>
