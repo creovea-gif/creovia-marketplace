@@ -1,39 +1,222 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Dashboard - CREOVIA</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-<style>
-*{font-family:'Poppins';margin:0;padding:0;box-sizing:border-box}
-body{background:#f5f5f5}
-header{background:#6C4BFF;color:white;padding:20px}
-nav a{color:white;margin-right:15px;text-decoration:none;font-weight:600}
-main{max-width:900px;margin:60px auto;background:white;padding:40px;border-radius:20px}
-.stat{background:#f0f0f0;padding:20px;border-radius:12px;margin-bottom:15px}
-footer{margin-top:80px;padding:25px;background:#0F172A;color:white;text-align:center}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - CREOVIA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: #f9fafb;
+            color: #111827;
+            line-height: 1.6;
+        }
+
+        header {
+            background: #6d28d9;
+            color: white;
+            padding: 1.1rem 5%;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 1.95rem;
+            font-weight: 700;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-left: 2.2rem;
+            font-weight: 500;
+            transition: color 0.25s;
+        }
+
+        nav a:hover {
+            color: #ddd6fe;
+        }
+
+        main {
+            max-width: 1000px;
+            margin: 60px auto;
+            padding: 0 5%;
+        }
+
+        .dashboard-header {
+            margin-bottom: 2.5rem;
+            text-align: center;
+        }
+
+        .dashboard-header h2 {
+            font-size: 2.2rem;
+            color: #111827;
+            margin-bottom: 0.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem 1.8rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            text-align: center;
+            transition: transform 0.25s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-6px);
+        }
+
+        .stat-icon {
+            font-size: 2.8rem;
+            margin-bottom: 1rem;
+            color: #6d28d9;
+        }
+
+        .stat-value {
+            font-size: 2.4rem;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 0.4rem;
+        }
+
+        .stat-label {
+            color: #6b7280;
+            font-size: 1.05rem;
+            font-weight: 500;
+        }
+
+        .recent-products {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        }
+
+        .recent-products h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: #111827;
+        }
+
+        .product-item {
+            padding: 1rem 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .product-item:last-child {
+            border-bottom: none;
+        }
+
+        .product-name {
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .product-info {
+            color: #6b7280;
+            font-size: 0.95rem;
+        }
+
+        footer {
+            margin-top: 6rem;
+            padding: 2.5rem;
+            background: #111827;
+            color: #d1d5db;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            nav a {
+                margin-left: 1.2rem;
+                font-size: 0.95rem;
+            }
+        }
+    </style>
 </head>
-
 <body>
-<header>
-<h1>CREOVIA</h1>
-<nav>
-<a href="index.html">Home</a>
-<a href="categories.html">Categories</a>
-<a href="index.html#upload-section">Upload</a>
-<a href="dashboard.html">Dashboard</a>
-<a href="contact.html">Contact</a>
-</nav>
-</header>
 
-<main>
-<h2>Dashboard</h2>
-<div class="stat">📦 Products Uploaded: 0</div>
-<div class="stat">💰 Total Earnings: $0</div>
-<div class="stat">⬇ Downloads: 0</div>
-</main>
+    <header>
+        <div class="container">
+            <h1>CREOVIA</h1>
+            <nav>
+                <a href="index.html">Home</a>
+                <a href="categories.html">Categories</a>
+                <a href="index.html#upload-section">Upload</a>
+                <a href="dashboard.html">Dashboard</a>
+                <a href="contact.html">Contact</a>
+            </nav>
+        </div>
+    </header>
 
-<footer>&copy; 2026 CREOVIA</footer>
+    <main>
+        <div class="dashboard-header">
+            <h2>Your Dashboard</h2>
+            <p style="color:#6b7280;">Overview of your activity and earnings</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">📦</div>
+                <div class="stat-value">0</div>
+                <div class="stat-label">Products Uploaded</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-value">$0</div>
+                <div class="stat-label">Total Earnings</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">⬇</div>
+                <div class="stat-value">0</div>
+                <div class="stat-label">Total Downloads</div>
+            </div>
+        </div>
+
+        <div class="recent-products">
+            <h3>Recent Products</h3>
+            <div class="product-item">
+                <div class="product-name">No products uploaded yet</div>
+                <div class="product-info">Upload your first digital product to start seeing it here</div>
+            </div>
+            <!-- يمكن إضافة المزيد من المنتجات لاحقاً ديناميكياً -->
+        </div>
+    </main>
+
+    <footer>
+        © 2026 CREOVIA — All Rights Reserved
+    </footer>
+
 </body>
 </html>
