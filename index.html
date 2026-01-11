@@ -210,21 +210,24 @@ for (let i = 0; i < files.length; i++) {
   formData.append('files', files[i]);
 }
 
-fetch('https://backend-creovea.onrender.com/upload', {
-  method: 'POST',
-  body: formData
-})
-.then(res => res.json())
-.then(data => {
-  alert(data.message);
-  uploadForm.reset();
-  uploadForm.style.display = 'none';
-})
-.catch(err => {
-  console.error(err);
-  alert('Upload failed');
+
+ Array.from(files).forEach(file => {
+  formData.append('files', file);
 });
 
+  try {
+  const res = await fetch('https://backend-creovea.onrender.com/upload', {
+    method: 'POST',
+    body: formData
+  });
+
+  const text = await res.text();
+
+  if (!res.ok) {
+    console.error(text);
+    alert('Upload failed:\n' + text);
+    return;
+  }
 
 
 
@@ -305,6 +308,7 @@ loadProducts();
 
 </body>
 </html>
+
 
 
 
