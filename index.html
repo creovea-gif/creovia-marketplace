@@ -211,22 +211,31 @@ uploadForm.addEventListener('submit', async (e) => {
   }
 
   try {
-    const res = await fetch('https://backend-creovea.onrender.com/upload', {
-      method: 'POST',
-      body: formData
-    });
+  const res = await fetch('https://backend-creovea.onrender.com/upload', {
+    method: 'POST',
+    body: formData
+  });
 
-    const data = await res.json();
-    alert(data.message || 'Uploaded successfully');
+  const text = await res.text();
 
-    uploadForm.reset();
-    uploadForm.style.display = 'none';
-    loadProducts();
-
-  } catch (err) {
-    console.error(err);
-    alert('Upload failed');
+  if (!res.ok) {
+    console.error(text);
+    alert('Upload failed:\n' + text);
+    return;
   }
+
+  const data = JSON.parse(text);
+  alert(data.message || 'Uploaded successfully');
+
+  uploadForm.reset();
+  uploadForm.style.display = 'none';
+  loadProducts();
+
+} catch (err) {
+  console.error(err);
+  alert('Server error – check backend logs');
+}
+
 });
 
 /* ================== Load products ================== */
@@ -292,6 +301,7 @@ loadProducts();
 
 </body>
 </html>
+
 
 
 
