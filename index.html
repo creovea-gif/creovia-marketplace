@@ -1,45 +1,46 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CREOVIA - السوق الرقمي</title>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <title>CREOVIA - Digital Marketplace</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Tajawal', sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
         }
 
         body {
-            background: #f8f9fc;
-            color: #1e293b;
+            background: #f9fafb;
+            color: #111827;
             line-height: 1.6;
         }
 
         header {
             background: #6d28d9;
             color: white;
-            padding: 1.2rem 5%;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1.1rem 5%;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
             position: sticky;
             top: 0;
             z-index: 100;
         }
 
-        header .container {
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            max-width: 1400px;
-            margin: 0 auto;
         }
 
         h1 {
-            font-size: 1.9rem;
+            font-size: 1.95rem;
+            font-weight: 700;
         }
 
         nav a {
@@ -47,31 +48,31 @@
             text-decoration: none;
             margin-left: 2.2rem;
             font-weight: 500;
-            transition: 0.3s;
+            transition: color 0.25s;
         }
 
         nav a:hover {
-            color: #c4b5fd;
+            color: #ddd6fe;
         }
 
         .hero {
             background: linear-gradient(135deg, #6d28d9 0%, #8b5cf6 100%);
             color: white;
             text-align: center;
-            padding: 7rem 5% 6rem;
-            margin-bottom: 3rem;
+            padding: 7.5rem 5% 6rem;
         }
 
         .hero h2 {
-            font-size: 2.8rem;
-            margin-bottom: 1rem;
+            font-size: 2.9rem;
+            margin-bottom: 1.1rem;
+            font-weight: 700;
         }
 
         .hero p {
-            font-size: 1.25rem;
-            max-width: 700px;
+            font-size: 1.3rem;
+            max-width: 720px;
             margin: 0 auto;
-            opacity: 0.9;
+            opacity: 0.92;
         }
 
         main {
@@ -82,15 +83,15 @@
 
         .filters {
             text-align: center;
-            margin: 2rem 0 3rem;
+            margin: 2.5rem 0 3.5rem;
         }
 
         .filter-btn {
-            background: #e2e8f0;
+            background: #e5e7eb;
             border: none;
-            padding: 0.7rem 1.4rem;
-            margin: 0.4rem;
-            border-radius: 50px;
+            padding: 0.75rem 1.5rem;
+            margin: 0.45rem;
+            border-radius: 999px;
             cursor: pointer;
             font-weight: 500;
             transition: all 0.25s;
@@ -101,117 +102,116 @@
             background: #6d28d9;
             color: white;
             transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(109,40,217,0.25);
         }
 
         .products {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(285px, 1fr));
             gap: 2rem;
-            margin-bottom: 4rem;
+            margin-bottom: 5rem;
         }
 
         .product-card {
             background: white;
             border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
             transition: all 0.3s ease;
-            text-align: center;
         }
 
         .product-card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 15px 35px rgba(109,40,217,0.18);
+            box-shadow: 0 16px 40px rgba(109,40,217,0.2);
         }
 
         .product-card img {
             width: 100%;
-            height: 220px;
+            height: 225px;
             object-fit: contain;
-            background: #f8fafc;
-            padding: 1.5rem;
+            background: #f3f4f6;
+            padding: 1.6rem;
         }
 
         .product-info {
-            padding: 1.3rem 1.2rem 1.6rem;
+            padding: 1.4rem 1.5rem 1.8rem;
+            text-align: center;
         }
 
         .product-info h3 {
-            font-size: 1.25rem;
-            margin-bottom: 0.7rem;
-            color: #1e293b;
+            font-size: 1.28rem;
+            margin-bottom: 0.6rem;
+            font-weight: 600;
         }
 
-        .product-info .type {
+        .type-badge {
+            display: inline-block;
+            background: #ede9fe;
             color: #6d28d9;
-            font-weight: 600;
-            font-size: 0.95rem;
-            margin-bottom: 0.6rem;
+            padding: 0.35rem 0.9rem;
+            border-radius: 999px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 0.8rem;
         }
 
         .price {
-            font-size: 1.4rem;
+            font-size: 1.45rem;
             font-weight: 700;
             color: #059669;
-            margin: 0.8rem 0;
+            margin: 0.9rem 0;
         }
 
         .download-btn {
             background: #6d28d9;
             color: white;
             border: none;
-            padding: 0.9rem 1.8rem;
-            border-radius: 50px;
+            padding: 0.95rem 2rem;
+            border-radius: 999px;
             cursor: pointer;
             font-weight: 600;
             width: 100%;
-            transition: 0.3s;
+            transition: background 0.3s;
         }
 
         .download-btn:hover {
             background: #5b21b6;
         }
 
-        /* قسم الرفع */
+        /* Upload Section */
         .upload-section {
             background: white;
             border-radius: 20px;
-            padding: 3rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.07);
+            padding: 3.2rem;
+            box-shadow: 0 10px 35px rgba(0,0,0,0.08);
             margin: 5rem auto;
-            max-width: 800px;
+            max-width: 820px;
         }
 
         .upload-section h2 {
             text-align: center;
-            color: #1e293b;
-            margin-bottom: 1.5rem;
+            color: #111827;
+            margin-bottom: 1.8rem;
+            font-size: 2.1rem;
         }
 
-        .upload-box {
-            border: 2px dashed #cbd5e1;
-            border-radius: 12px;
-            padding: 2rem;
-            text-align: center;
-            margin: 1.5rem 0;
-            background: #f8fafc;
-            transition: border-color 0.3s;
+        .form-group {
+            margin-bottom: 1.6rem;
         }
 
-        .upload-box:hover {
-            border-color: #6d28d9;
-        }
-
-        .upload-box label {
-            font-weight: 600;
+        label {
             display: block;
-            margin-bottom: 0.8rem;
-            color: #334155;
+            margin-bottom: 0.6rem;
+            font-weight: 600;
+            color: #374151;
         }
 
         input[type="file"] {
-            display: block;
-            margin: 1rem auto;
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px dashed #d1d5db;
+            border-radius: 12px;
+            background: #f9fafb;
         }
 
         input[type="text"],
@@ -219,15 +219,14 @@
         select,
         input[type="number"] {
             width: 100%;
-            padding: 0.9rem 1.2rem;
-            margin: 0.8rem 0;
-            border: 1px solid #e2e8f0;
+            padding: 0.95rem 1.3rem;
+            border: 1px solid #d1d5db;
             border-radius: 10px;
             font-size: 1rem;
         }
 
         textarea {
-            min-height: 110px;
+            min-height: 120px;
             resize: vertical;
         }
 
@@ -235,14 +234,14 @@
             background: #10b981;
             color: white;
             border: none;
-            padding: 1rem 2.5rem;
-            border-radius: 50px;
-            font-size: 1.1rem;
+            padding: 1.1rem 2.8rem;
+            border-radius: 999px;
+            font-size: 1.12rem;
             font-weight: 600;
             cursor: pointer;
-            margin-top: 1.5rem;
             width: 100%;
-            transition: 0.3s;
+            margin-top: 1.8rem;
+            transition: background 0.3s;
         }
 
         .submit-btn:hover {
@@ -250,17 +249,17 @@
         }
 
         footer {
-            background: #0f172a;
-            color: white;
+            background: #111827;
+            color: #d1d5db;
             text-align: center;
-            padding: 2.5rem;
+            padding: 3rem 1rem;
             margin-top: 6rem;
         }
 
         @media (max-width: 768px) {
-            .hero h2 { font-size: 2.2rem; }
-            .hero p { font-size: 1.1rem; }
-            nav a { margin-left: 1.2rem; font-size: 0.95rem; }
+            .hero h2 { font-size: 2.3rem; }
+            .hero p { font-size: 1.15rem; }
+            nav a { margin-left: 1.3rem; font-size: 0.96rem; }
         }
     </style>
 </head>
@@ -270,83 +269,96 @@
         <div class="container">
             <h1>CREOVIA</h1>
             <nav>
-                <a href="#">الرئيسية</a>
-                <a href="#">التصنيفات</a>
-                <a href="#upload-section">رفع منتج</a>
-                <a href="#">لوحة التحكم</a>
-                <a href="#">تواصل معنا</a>
+                <a href="#">Home</a>
+                <a href="#">Categories</a>
+                <a href="#upload-section">Upload</a>
+                <a href="#">Dashboard</a>
+                <a href="#">Contact</a>
             </nav>
         </div>
     </header>
 
     <section class="hero">
-        <h2>بيع واشترِ المنتجات الرقمية بسهولة</h2>
-        <p>كتب إلكترونية، قوالب، تصاميم شعارات، مجلات رقمية وغيرها الكثير... كل ذلك في مكان واحد</p>
+        <h2>Sell & Buy Digital Products Easily</h2>
+        <p>Ebooks, templates, logos, digital magazines, design assets and more — all in one beautiful marketplace.</p>
     </section>
 
     <main>
         <div class="filters">
-            <button class="filter-btn active" onclick="filterProducts('all')">الكل</button>
-            <button class="filter-btn" onclick="filterProducts('ebook')">كتب إلكترونية</button>
-            <button class="filter-btn" onclick="filterProducts('template')">قوالب</button>
-            <button class="filter-btn" onclick="filterProducts('magazine')">مجلات</button>
-            <button class="filter-btn" onclick="filterProducts('logo')">شعارات</button>
+            <button class="filter-btn active" onclick="filterProducts('all')">All</button>
+            <button class="filter-btn" onclick="filterProducts('ebook')">Ebooks</button>
+            <button class="filter-btn" onclick="filterProducts('template')">Templates</button>
+            <button class="filter-btn" onclick="filterProducts('magazine')">Magazines</button>
+            <button class="filter-btn" onclick="filterProducts('logo')">Logos</button>
         </div>
 
         <section class="products" id="productsContainer">
-            <!-- المنتجات ستُضاف هنا بواسطة JavaScript -->
+            <!-- Products will be loaded here -->
         </section>
 
         <section class="upload-section" id="upload-section">
-            <h2>رفع منتجك الرقمي</h2>
+            <h2>Upload Your Digital Product</h2>
             
             <form id="uploadForm">
-                <div class="upload-box">
-                    <label>صورة معاينة المنتج (Preview)</label>
+                <div class="form-group">
+                    <label>Product Preview Image</label>
                     <input type="file" id="previewImage" name="preview" accept="image/*" required>
                 </div>
 
-                <div class="upload-box">
-                    <label>ملف/ملفات المنتج</label>
+                <div class="form-group">
+                    <label>Product File</label>
                     <input type="file" id="fileInput" name="file" required>
-                    <!-- حالياً يدعم الباك إند ملف واحد فقط -->
+                    <!-- Current backend supports 1 file only -->
                 </div>
 
-                <input type="text" id="productName" placeholder="اسم المنتج" required>
-                <textarea id="productDesc" placeholder="وصف المنتج..." required></textarea>
-                
-                <select id="productType" required>
-                    <option value="">اختر نوع المنتج</option>
-                    <option value="ebook">كتاب إلكتروني</option>
-                    <option value="template">قالب</option>
-                    <option value="magazine">مجلة رقمية</option>
-                    <option value="logo">شعار</option>
-                </select>
+                <div class="form-group">
+                    <label>Product Name</label>
+                    <input type="text" id="productName" placeholder="e.g. Minimalist Logo Pack" required>
+                </div>
 
-                <input type="number" id="productPrice" placeholder="السعر بالدولار ($)" min="1" step="0.01" required>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="productDesc" placeholder="Describe your product..." required></textarea>
+                </div>
 
-                <button type="submit" class="submit-btn">رفع المنتج</button>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="productType" required>
+                        <option value="">Select category</option>
+                        <option value="ebook">Ebook</option>
+                        <option value="template">Template</option>
+                        <option value="magazine">Magazine</option>
+                        <option value="logo">Logo</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Price (USD)</label>
+                    <input type="number" id="productPrice" placeholder="19.99" min="0.99" step="0.01" required>
+                </div>
+
+                <button type="submit" class="submit-btn">Upload Product</button>
             </form>
         </section>
     </main>
 
     <footer>
-        <p>© 2026 CREOVIA - جميع الحقوق محفوظة</p>
+        <p>© 2026 CREOVIA — All Rights Reserved</p>
     </footer>
 
     <script>
         let allProducts = [];
 
-        // تحميل المنتجات عند فتح الصفحة
         async function loadProducts() {
             try {
                 const res = await fetch('https://backend-creovea.onrender.com/products');
+                if (!res.ok) throw new Error('Failed to fetch products');
                 allProducts = await res.json();
                 renderProducts(allProducts);
             } catch (err) {
-                console.error('Error loading products:', err);
+                console.error('Error:', err);
                 document.getElementById('productsContainer').innerHTML = 
-                    '<p style="text-align:center;color:#e11d48;">تعذر تحميل المنتجات حالياً...</p>';
+                    '<p style="text-align:center; color:#ef4444; grid-column:1/-1; font-size:1.2rem;">Unable to load products at the moment...</p>';
             }
         }
 
@@ -355,24 +367,24 @@
             container.innerHTML = '';
 
             if (products.length === 0) {
-                container.innerHTML = '<p style="text-align:center;grid-column:1/-1;font-size:1.2rem;color:#64748b;">لا توجد منتجات متاحة حالياً</p>';
+                container.innerHTML = '<p style="text-align:center; grid-column:1/-1; color:#6b7280; font-size:1.25rem;">No products available yet</p>';
                 return;
             }
 
-            products.forEach(product => {
+            products.forEach(p => {
                 const card = document.createElement('div');
                 card.className = 'product-card';
 
-                const downloadUrl = product.fileUrl?.replace('/upload/', '/upload/fl_attachment/') || '#';
+                const downloadUrl = p.fileUrl?.replace('/upload/', '/upload/fl_attachment/') || '#';
 
                 card.innerHTML = `
-                    <img src="${product.previewImage || 'https://via.placeholder.com/300x220?text=No+Preview'}" alt="${product.name}">
+                    <img src="${p.previewImage || 'https://via.placeholder.com/300x225?text=Preview'}" alt="${p.name}">
                     <div class="product-info">
-                        <h3>${product.name}</h3>
-                        <div class="type">${product.type || 'غير محدد'}</div>
-                        <div class="price">$${Number(product.price).toFixed(2)}</div>
-                        <a href="${downloadUrl}" target="_blank">
-                            <button class="download-btn">تحميل المنتج</button>
+                        <h3>${p.name}</h3>
+                        <span class="type-badge">${p.type || 'Unknown'}</span>
+                        <div class="price">$${Number(p.price).toFixed(2)}</div>
+                        <a href="${downloadUrl}" target="_blank" rel="noopener">
+                            <button class="download-btn">Download</button>
                         </a>
                     </div>
                 `;
@@ -392,8 +404,8 @@
             }
         }
 
-        // رفع المنتج
-        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+        // Handle product upload
+        document.getElementById('uploadForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
             const formData = new FormData();
@@ -414,19 +426,19 @@
                 const result = await response.json();
 
                 if (response.ok) {
-                    alert('تم رفع المنتج بنجاح!');
+                    alert('Product uploaded successfully!');
                     document.getElementById('uploadForm').reset();
                     loadProducts();
                 } else {
-                    alert('حدث خطأ: ' + (result.message || 'غير معروف'));
+                    alert('Upload failed: ' + (result.message || 'Unknown error'));
                 }
             } catch (error) {
-                alert('تعذر الاتصال بالخادم\n' + error.message);
+                alert('Could not connect to server\n' + error.message);
                 console.error(error);
             }
         });
 
-        // بدء التحميل
+        // Initial load
         loadProducts();
     </script>
 </body>
