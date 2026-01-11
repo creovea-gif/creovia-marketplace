@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CREOVIA - Digital Marketplace</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
+   
     <style>
         * {
             box-sizing: border-box;
@@ -178,7 +178,7 @@
             background: #5b21b6;
         }
 
-        /* Upload Section */
+        /* === Upload Section === */
         .upload-section {
             background: white;
             border-radius: 20px;
@@ -196,22 +196,65 @@
         }
 
         .form-group {
-            margin-bottom: 1.6rem;
+            margin-bottom: 2rem;
         }
 
         label {
             display: block;
-            margin-bottom: 0.6rem;
+            margin-bottom: 0.7rem;
             font-weight: 600;
             color: #374151;
         }
 
-        input[type="file"] {
-            width: 100%;
-            padding: 0.8rem;
-            border: 2px dashed #d1d5db;
+        .upload-area {
+            border: 2px dashed #9ca3af;
             border-radius: 12px;
+            padding: 2.5rem 1.5rem;
+            text-align: center;
             background: #f9fafb;
+            transition: all 0.25s ease;
+            cursor: pointer;
+            min-height: 160px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .upload-area:hover,
+        .upload-area.dragover {
+            border-color: #6d28d9;
+            background: #f3e8ff;
+            box-shadow: 0 0 0 3px rgba(109,40,217,0.12);
+        }
+
+        .upload-area .icon {
+            font-size: 3.2rem;
+            margin-bottom: 1rem;
+            color: #9ca3af;
+        }
+
+        .upload-area p {
+            margin: 0.4rem 0;
+            color: #4b5563;
+        }
+
+        .upload-area .hint {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 0.5rem;
+        }
+
+        .file-name {
+            margin-top: 1rem;
+            color: #059669;
+            font-weight: 500;
+            font-size: 0.95rem;
+            word-break: break-all;
+        }
+
+        input[type="file"] {
+            display: none;
         }
 
         input[type="text"],
@@ -240,7 +283,7 @@
             font-weight: 600;
             cursor: pointer;
             width: 100%;
-            margin-top: 1.8rem;
+            margin-top: 2rem;
             transition: background 0.3s;
         }
 
@@ -259,7 +302,7 @@
         @media (max-width: 768px) {
             .hero h2 { font-size: 2.3rem; }
             .hero p { font-size: 1.15rem; }
-            nav a { margin-left: 1.3rem; font-size: 0.96rem; }
+            nav a { margin-left: 1.2rem; font-size: 0.95rem; }
         }
     </style>
 </head>
@@ -268,13 +311,13 @@
     <header>
         <div class="container">
             <h1>CREOVIA</h1>
-           <nav>
-    <a href="index.html">Home</a>
-    <a href="categories.html">Categories</a>
-    <a href="#upload-section">Upload</a>   <!-- يبقى داخلي في الصفحة الرئيسية -->
-    <a href="dashboard.html">Dashboard</a>
-    <a href="contact.html">Contact</a>
-</nav>
+            <nav>
+                <a href="index.html">Home</a>
+                <a href="categories.html">Categories</a>
+                <a href="#upload-section">Upload</a>
+                <a href="dashboard.html">Dashboard</a>
+                <a href="contact.html">Contact</a>
+            </nav>
         </div>
     </header>
 
@@ -300,15 +343,28 @@
             <h2>Upload Your Digital Product</h2>
             
             <form id="uploadForm">
+                <!-- Preview Image Upload Area -->
                 <div class="form-group">
                     <label>Product Preview Image</label>
-                    <input type="file" id="previewImage" name="preview" accept="image/*" required>
+                    <div class="upload-area" id="previewArea">
+                        <div class="icon">🖼️</div>
+                        <p><strong>Click to select</strong> or drag & drop image here</p>
+                        <p class="hint">PNG, JPG, recommended size 1200×800 or larger</p>
+                        <div class="file-name" id="previewFileName"></div>
+                        <input type="file" id="previewImage" name="preview" accept="image/*" required>
+                    </div>
                 </div>
 
+                <!-- Product File Upload Area -->
                 <div class="form-group">
-                    <label>Product File</label>
-                    <input type="file" id="fileInput" name="file" required>
-                    <!-- Current backend supports 1 file only -->
+                    <label>Main Product File</label>
+                    <div class="upload-area" id="fileArea">
+                        <div class="icon">📦</div>
+                        <p><strong>Click to select</strong> or drag & drop your file here</p>
+                        <p class="hint">PDF, ZIP, PSD, AI, FIG, EPUB, etc.</p>
+                        <div class="file-name" id="mainFileName"></div>
+                        <input type="file" id="fileInput" name="file" required>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -347,6 +403,54 @@
     </footer>
 
     <script>
+        // ==============================================
+        // Upload areas improvement (click + drag & drop)
+        // ==============================================
+        function setupUploadArea(areaId, inputId, nameDisplayId) {
+            const area = document.getElementById(areaId);
+            const input = document.getElementById(inputId);
+            const nameDisplay = document.getElementById(nameDisplayId);
+
+            area.addEventListener('click', () => input.click());
+
+            input.addEventListener('change', updateFileName);
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                area.addEventListener(eventName, e => {
+                    e.preventDefault();
+                    area.classList.add('dragover');
+                });
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                area.addEventListener(eventName, e => {
+                    e.preventDefault();
+                    area.classList.remove('dragover');
+                });
+            });
+
+            area.addEventListener('drop', e => {
+                if (e.dataTransfer.files.length > 0) {
+                    input.files = e.dataTransfer.files;
+                    updateFileName();
+                }
+            });
+
+            function updateFileName() {
+                if (input.files.length > 0) {
+                    nameDisplay.textContent = input.files[0].name;
+                } else {
+                    nameDisplay.textContent = '';
+                }
+            }
+        }
+
+        setupUploadArea('previewArea', 'previewImage', 'previewFileName');
+        setupUploadArea('fileArea', 'fileInput', 'mainFileName');
+
+        // ==============================================
+        // Existing product loading & upload logic
+        // ==============================================
         let allProducts = [];
 
         async function loadProducts() {
@@ -357,7 +461,7 @@
                 renderProducts(allProducts);
             } catch (err) {
                 console.error('Error:', err);
-                document.getElementById('productsContainer').innerHTML = 
+                document.getElementById('productsContainer').innerHTML =
                     '<p style="text-align:center; color:#ef4444; grid-column:1/-1; font-size:1.2rem;">Unable to load products at the moment...</p>';
             }
         }
@@ -404,7 +508,6 @@
             }
         }
 
-        // Handle product upload
         document.getElementById('uploadForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
@@ -428,6 +531,8 @@
                 if (response.ok) {
                     alert('Product uploaded successfully!');
                     document.getElementById('uploadForm').reset();
+                    document.getElementById('previewFileName').textContent = '';
+                    document.getElementById('mainFileName').textContent = '';
                     loadProducts();
                 } else {
                     alert('Upload failed: ' + (result.message || 'Unknown error'));
@@ -443,4 +548,3 @@
     </script>
 </body>
 </html>
-
