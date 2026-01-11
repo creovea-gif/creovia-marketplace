@@ -7,16 +7,18 @@
 
   <!-- Firebase SDK v10+ (modular) -->
   <script type="module">
-    // === استبدل هذه القيم بمعلومات مشروعك الحقيقية من Firebase Console ===
+    // Your Firebase configuration (الذي أرسلته)
     const firebaseConfig = {
-      apiKey: "AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+      apiKey: "AIzaSyCh2Pf1c1Gb7fQCQy64WmNYvWBKffwiuOs",
       authDomain: "creoveo-7da32.firebaseapp.com",
       projectId: "creoveo-7da32",
-      storageBucket: "creoveo-7da32.appspot.com",
-      messagingSenderId: "XXXXXXXXXXXX",
-      appId: "1:XXXXXXXXXXXX:web:xxxxxxxxxxxxxxxxxxxxxx"
+      storageBucket: "creoveo-7da32.firebasestorage.app",
+      messagingSenderId: "819015345734",
+      appId: "1:819015345734:web:b12e15fcaa6c3234b7cc47",
+      measurementId: "G-58G17GT7VF"
     };
 
+    // استيراد المكتبات اللازمة
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
     import { 
       getAuth, 
@@ -29,14 +31,14 @@
     const auth = getAuth(app);
 
     document.addEventListener("DOMContentLoaded", () => {
-      const loginForm   = document.getElementById("loginForm");
-      const emailInput  = document.getElementById("email");
+      const loginForm     = document.getElementById("loginForm");
+      const emailInput    = document.getElementById("email");
       const passwordInput = document.getElementById("password");
-      const errorMsg    = document.getElementById("error-message");
-      const submitBtn   = document.getElementById("submitBtn");
-      const statusText  = document.getElementById("status-text");
+      const errorMsg      = document.getElementById("error-message");
+      const statusText    = document.getElementById("status-text");
+      const submitBtn     = document.getElementById("submitBtn");
 
-      // إذا كان المستخدم مسجلاً دخول → انتقل للرئيسية
+      // إذا كان المستخدم مسجل دخول بالفعل → انتقل مباشرة للصفحة الرئيسية
       onAuthStateChanged(auth, (user) => {
         if (user) {
           window.location.href = "index.html";
@@ -55,17 +57,20 @@
         }
 
         errorMsg.textContent = "";
+        statusText.textContent = "";
         submitBtn.disabled = true;
         submitBtn.textContent = "Processing...";
-        statusText.textContent = "";
 
         try {
-          // أولاً نحاول تسجيل الدخول
+          // المحاولة الأولى: تسجيل الدخول
           await signInWithEmailAndPassword(auth, email, password);
-          // نجاح تسجيل الدخول → انتقل
-          window.location.href = "index.html";
+          // نجاح تسجيل الدخول
+          statusText.textContent = "Login successful! Redirecting...";
+          setTimeout(() => {
+            window.location.href = "index.html";
+          }, 800);
         } catch (error) {
-          // إذا كان الخطأ بسبب أن الحساب غير موجود → نسجله تلقائياً
+          // إذا كان الحساب غير موجود → نسجله تلقائياً
           if (error.code === "auth/user-not-found" || 
               error.code === "auth/invalid-credential") {
             
@@ -74,19 +79,26 @@
             try {
               await createUserWithEmailAndPassword(auth, email, password);
               statusText.textContent = "Account created! Logging you in...";
-              // بعد التسجيل الناجح → يتم تسجيل الدخول تلقائياً
-              window.location.href = "index.html";
+              setTimeout(() => {
+                window.location.href = "index.html";
+              }, 1200);
             } catch (createError) {
               let msg = "Failed to create account.";
-              if (createError.code === "auth/email-already-in-use") {
-                msg = "This email is already registered. Please use another email.";
-              } else if (createError.code === "auth/weak-password") {
-                msg = "Password should be at least 6 characters.";
+              switch(createError.code) {
+                case "auth/email-already-in-use":
+                  msg = "This email is already registered.";
+                  break;
+                case "auth/weak-password":
+                  msg = "Password should be at least 6 characters.";
+                  break;
+                case "auth/invalid-email":
+                  msg = "Invalid email format.";
+                  break;
               }
               errorMsg.textContent = msg;
             }
           } else {
-            // أخطاء أخرى (كلمة مرور خاطئة، مشكلة في الشبكة، إلخ)
+            // أخطاء أخرى
             let msg = "Login failed.";
             switch(error.code) {
               case "auth/wrong-password":
@@ -113,13 +125,13 @@
     :root {
       --primary: #6d28d9;
       --primary-dark: #5b21b6;
-      --light: #f9fafb;
-      --gray: #6b7280;
-      --danger: #dc2626;
       --success: #059669;
+      --danger: #dc2626;
+      --gray: #6b7280;
     }
 
     * { margin:0; padding:0; box-sizing:border-box; }
+
     body {
       font-family: 'Inter', system-ui, sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -130,7 +142,7 @@
       padding: 20px;
     }
 
-    .login-box {
+    .login-container {
       background: white;
       border-radius: 16px;
       box-shadow: 0 20px 50px rgba(0,0,0,0.25);
@@ -219,19 +231,20 @@
       cursor: not-allowed;
     }
 
-    .footer-text {
+    .info-text {
       text-align: center;
-      margin-top: 2rem;
+      margin-top: 1.8rem;
       color: var(--gray);
       font-size: 0.93rem;
+      line-height: 1.5;
     }
   </style>
 </head>
 <body>
 
-  <div class="login-box">
+  <div class="login-container">
     <div class="logo">CREOVIA</div>
-    <h1>Login or Create Account</h1>
+    <h1>Login or Sign Up</h1>
 
     <form id="loginForm">
       <div class="form-group">
@@ -263,8 +276,9 @@
       <button type="submit" id="submitBtn">Login / Sign Up</button>
     </form>
 
-    <div class="footer-text">
-      First time? Just enter your email & password — account will be created automatically!
+    <div class="info-text">
+      First time here? Just enter your email & password —<br>
+      your account will be created automatically!
     </div>
   </div>
 
