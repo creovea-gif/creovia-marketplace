@@ -6,6 +6,9 @@
     <title>CREOVIA - Digital Marketplace</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
+    <!-- PayPal JavaScript SDK (Sandbox للتجربة - غيّر إلى Live لاحقاً) -->
+    <script src="https://www.paypal.com/sdk/js?client-id=AR_2EtGAODL-SCx1a3EEQkZyeGapi-9qWuKZ4xNBO2vaAnSX0oy4SPI-0RwjSAULiOGa8iE9bNj3JQ7X&currency=USD"></script>
+
     <!-- Firebase SDK (modular) -->
     <script type="module">
         // Firebase Configuration (من مشروعك)
@@ -18,23 +21,19 @@
             appId: "1:819015345734:web:b12e15fcaa6c3234b7cc47",
             measurementId: "G-58G17GT7VF"
         };
-
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-        import { 
-            getAuth, 
+        import {
+            getAuth,
             onAuthStateChanged,
-            signOut 
+            signOut
         } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-
         // مراقبة حالة تسجيل الدخول
         onAuthStateChanged(auth, (user) => {
             const userEmailElement = document.getElementById("user-email");
-            const logoutBtn       = document.getElementById("logout-btn");
-            const loginLink       = document.getElementById("login-link");
-
+            const logoutBtn = document.getElementById("logout-btn");
+            const loginLink = document.getElementById("login-link");
             if (user) {
                 // المستخدم مسجل دخول → إظهار الإيميل + زر Logout
                 userEmailElement.textContent = user.email;
@@ -48,7 +47,6 @@
                 loginLink.style.display = "inline";
             }
         });
-
         // دالة تسجيل الخروج (تم التأكد من عملها)
         window.handleLogout = function() {
             signOut(auth)
@@ -273,19 +271,9 @@
             color: #059669;
             margin: 0.6rem 0 1rem;
         }
-        .download-btn {
-            background: #6d28d9;
-            color: white;
-            border: none;
-            padding: 0.95rem 2rem;
-            border-radius: 999px;
-            cursor: pointer;
-            font-weight: 600;
+        .buy-btn-container {
             width: 100%;
-            transition: background 0.3s;
-        }
-        .download-btn:hover {
-            background: #5b21b6;
+            min-height: 50px;
         }
         .upload-section {
             background: white;
@@ -404,7 +392,6 @@
     </style>
 </head>
 <body>
-
     <header>
         <div class="container">
             <h1>CREOVIA</h1>
@@ -420,12 +407,10 @@
             </nav>
         </div>
     </header>
-
     <section class="hero">
         <h2>Sell & Buy Digital Products Easily</h2>
         <p>Ebooks, templates, logos, digital magazines, design assets and more — all in one beautiful marketplace.</p>
     </section>
-
     <main>
         <div class="search-and-filters">
             <div class="search-container">
@@ -440,11 +425,9 @@
                 <button class="filter-btn" onclick="filterProducts('logo')">Logos</button>
             </div>
         </div>
-
         <section class="products" id="productsContainer">
             <!-- Products will be loaded here -->
         </section>
-
         <section class="upload-section" id="upload-section">
             <h2>Upload Your Digital Product</h2>
          
@@ -459,7 +442,6 @@
                         <input type="file" id="previewImage" name="preview" accept="image/*" required>
                     </div>
                 </div>
-
                 <div class="form-group">
                     <label>Main Product File</label>
                     <div class="upload-area" id="fileArea">
@@ -470,17 +452,14 @@
                         <input type="file" id="fileInput" name="file" required>
                     </div>
                 </div>
-
                 <div class="form-group">
                     <label>Product Name</label>
                     <input type="text" id="productName" placeholder="e.g. Minimalist Logo Pack" required>
                 </div>
-
                 <div class="form-group">
                     <label>Description</label>
                     <textarea id="productDesc" placeholder="Describe your product..." required></textarea>
                 </div>
-
                 <div class="form-group">
                     <label>Category</label>
                     <select id="productType" required>
@@ -491,21 +470,17 @@
                         <option value="logo">Logo</option>
                     </select>
                 </div>
-
                 <div class="form-group">
                     <label>Price (USD)</label>
                     <input type="number" id="productPrice" placeholder="19.99" min="0.99" step="0.01" required>
                 </div>
-
                 <button type="submit" class="submit-btn">Upload Product</button>
             </form>
         </section>
     </main>
-
     <footer>
         <p>© 2026 CREOVIA — All Rights Reserved</p>
     </footer>
-
     <script>
         function setupUploadArea(areaId, inputId, nameDisplayId) {
             const area = document.getElementById(areaId);
@@ -541,10 +516,8 @@
         }
         setupUploadArea('previewArea', 'previewImage', 'previewFileName');
         setupUploadArea('fileArea', 'fileInput', 'mainFileName');
-
         let allProducts = [];
         let currentFilter = 'all';
-
         async function loadProducts() {
             try {
                 const res = await fetch('https://backend-creovea.onrender.com/products');
@@ -557,7 +530,6 @@
                     '<p style="text-align:center; color:#ef4444; grid-column:1/-1; font-size:1.2rem;">Unable to load products at the moment...</p>';
             }
         }
-
         function renderProducts(products) {
             const container = document.getElementById('productsContainer');
             container.innerHTML = '';
@@ -568,27 +540,75 @@
             products.forEach(p => {
                 const card = document.createElement('div');
                 card.className = 'product-card';
-                const downloadUrl = p.fileUrl?.replace('/upload/', '/upload/fl_attachment/') || '#';
+                const productId = p.id;
+                const price = Number(p.price).toFixed(2);
+                const name = p.name;
                 const salesCount = p.salesCount || 0;
+
                 card.innerHTML = `
-                    <img src="${p.previewImage || 'https://via.placeholder.com/300x225?text=Preview'}" alt="${p.name}">
+                    <img src="${p.previewImage || 'https://via.placeholder.com/300x225?text=Preview'}" alt="${name}">
                     <div class="product-info">
-                        <h3>${p.name}</h3>
+                        <h3>${name}</h3>
                         <span class="type-badge">${p.type || 'Unknown'}</span>
                         <div class="sales-count">Sales: ${salesCount}</div>
-                        <div class="price">$${Number(p.price).toFixed(2)}</div>
-                        <a href="${downloadUrl}" target="_blank" rel="noopener">
-                            <button class="download-btn">Download</button>
-                        </a>
+                        <div class="price">$${price}</div>
+                        <div class="buy-btn-container" id="paypal-button-${productId}"></div>
                     </div>
                 `;
                 container.appendChild(card);
+
+                // إنشاء زر PayPal ديناميكي لكل منتج
+                paypal.Buttons({
+                    createOrder: function(data, actions) {
+                        return actions.order.create({
+                            purchase_units: [{
+                                amount: {
+                                    value: price,
+                                    currency_code: 'USD'
+                                },
+                                description: `Purchase of ${name}`
+                            }]
+                        });
+                    },
+                    onApprove: function(data, actions) {
+                        return actions.order.capture().then(function(details) {
+                            alert('Payment successful! Thank you, ' + details.payer.name.given_name);
+                            
+                            // تسجيل الدفع في الـ backend وزيادة المبيعات + الحصول على رابط تحميل
+                            fetch('https://backend-creovea.onrender.com/record-payment', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    productId: productId,
+                                    orderId: data.orderID,
+                                    payerEmail: details.payer.email_address,
+                                    amount: price
+                                })
+                            })
+                            .then(res => res.json())
+                            .then(result => {
+                                if (result.downloadUrl) {
+                                    window.location.href = result.downloadUrl;
+                                } else {
+                                    alert('Payment recorded, download link will be sent soon.');
+                                }
+                            })
+                            .catch(err => {
+                                console.error(err);
+                                alert('Payment successful, but error getting download link.');
+                            });
+                        });
+                    },
+                    onError: function(err) {
+                        console.error('PayPal error:', err);
+                        alert('Payment failed. Please try again.');
+                    }
+                }).render(`#paypal-button-${productId}`);
             });
         }
-
         function updateProductsDisplay() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
-           
+          
             let filteredProducts = allProducts;
             if (currentFilter !== 'all') {
                 filteredProducts = filteredProducts.filter(p => p.type === currentFilter);
@@ -600,16 +620,13 @@
             }
             renderProducts(filteredProducts);
         }
-
         function filterProducts(type) {
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
             currentFilter = type;
             updateProductsDisplay();
         }
-
         document.getElementById('searchInput').addEventListener('input', updateProductsDisplay);
-
         document.getElementById('uploadForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const submitBtn = document.querySelector('.submit-btn');
@@ -619,7 +636,7 @@
             submitBtn.style.opacity = "0.7";
             submitBtn.style.cursor = "not-allowed";
             const formData = new FormData();
-          
+         
             formData.append('preview', document.getElementById('previewImage').files[0]);
             formData.append('file', document.getElementById('fileInput').files[0]);
             formData.append('name', document.getElementById('productName').value.trim());
@@ -651,7 +668,6 @@
                 submitBtn.style.cursor = "pointer";
             }
         });
-
         loadProducts();
     </script>
 </body>
