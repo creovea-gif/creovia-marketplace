@@ -430,7 +430,7 @@
         </section>
         <section class="upload-section" id="upload-section">
             <h2>Upload Your Digital Product</h2>
-        
+         
             <form id="uploadForm">
                 <div class="form-group">
                     <label>Product Preview Image</label>
@@ -544,6 +544,7 @@
                 const price = Number(p.price).toFixed(2);
                 const name = p.name;
                 const salesCount = p.salesCount || 0;
+
                 card.innerHTML = `
                     <img src="${p.previewImage || 'https://via.placeholder.com/300x225?text=Preview'}" alt="${name}">
                     <div class="product-info">
@@ -587,15 +588,14 @@
                             .then(res => res.json())
                             .then(result => {
                                 if (result.downloadUrl) {
-                                    alert('جاري التحميل...');
                                     window.location.href = result.downloadUrl;
                                 } else {
-                                    alert('الدفع نجح! رابط التحميل هيتبعتلك قريب.');
+                                    alert('Payment recorded, download link will be sent soon.');
                                 }
                             })
                             .catch(err => {
                                 console.error(err);
-                                alert('الدفع نجح، لكن حصل خطأ في الحصول على رابط التحميل. جرب تحديث الصفحة.');
+                                alert('Payment successful, but error getting download link.');
                             });
                         });
                     },
