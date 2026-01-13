@@ -430,7 +430,7 @@
         </section>
         <section class="upload-section" id="upload-section">
             <h2>Upload Your Digital Product</h2>
-         
+        
             <form id="uploadForm">
                 <div class="form-group">
                     <label>Product Preview Image</label>
@@ -544,7 +544,6 @@
                 const price = Number(p.price).toFixed(2);
                 const name = p.name;
                 const salesCount = p.salesCount || 0;
-
                 card.innerHTML = `
                     <img src="${p.previewImage || 'https://via.placeholder.com/300x225?text=Preview'}" alt="${name}">
                     <div class="product-info">
@@ -572,36 +571,42 @@
                     },
                     onApprove: function(data, actions) {
                         return actions.order.capture().then(function(details) {
-                            alert('Payment successful! Thank you, ' + details.payer.name.given_name);
+                            alert('الدفع نجح في PayPal! شكراً لك، ' + details.payer.name.given_name);
                             
-                            // تسجيل الدفع في الـ backend وزيادة المبيعات + الحصول على رابط تحميل
+                            // محاولة تسجيل الدفع في الـ backend
                             fetch('https://backend-creovea.onrender.com/record-payment', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({
                                     productId: productId,
                                     orderId: data.orderID,
-                                    payerEmail: details.payer.email_address,
+                                    payerEmail: details.payer.email_address || 'unknown',
                                     amount: price
                                 })
                             })
-                            .then(res => res.json())
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error('Backend response not ok: ' + response.status);
+                                }
+                                return response.json();
+                            })
                             .then(result => {
                                 if (result.downloadUrl) {
+                                    alert('جاري التحميل تلقائياً...');
                                     window.location.href = result.downloadUrl;
                                 } else {
-                                    alert('Payment recorded, download link will be sent soon.');
+                                    alert('الدفع نجح! رابط التحميل هيتبعت قريب (تحقق من الإيميل أو جرب تاني).');
                                 }
                             })
                             .catch(err => {
-                                console.error(err);
-                                alert('Payment successful, but error getting download link.');
+                                console.error('Backend error:', err);
+                                alert('الدفع نجح في PayPal! لكن حصل خطأ في تسجيل الدفع أو الحصول على الرابط. جرب تحديث الصفحة أو تواصل معي.');
                             });
                         });
                     },
                     onError: function(err) {
-                        console.error('PayPal error:', err);
-                        alert('Payment failed. Please try again.');
+                        console.error('PayPal SDK error:', err);
+                        alert('فشل الدفع في PayPal. جرب تاني أو استخدم طريقة دفع أخرى.');
                     }
                 }).render(`#paypal-button-${productId}`);
             });
