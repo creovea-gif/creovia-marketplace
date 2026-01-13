@@ -35,360 +35,79 @@
             const logoutBtn = document.getElementById("logout-btn");
             const loginLink = document.getElementById("login-link");
             if (user) {
-                // المستخدم مسجل دخول → إظهار الإيميل + زر Logout
                 userEmailElement.textContent = user.email;
                 userEmailElement.style.display = "inline";
                 logoutBtn.style.display = "inline-block";
                 loginLink.style.display = "none";
             } else {
-                // غير مسجل → إخفاء الإيميل و Logout، إظهار Login
                 userEmailElement.style.display = "none";
                 logoutBtn.style.display = "none";
                 loginLink.style.display = "inline";
             }
         });
-        // دالة تسجيل الخروج (تم التأكد من عملها)
+        // دالة تسجيل الخروج
         window.handleLogout = function() {
-            signOut(auth)
-                .then(() => {
-                    console.log("User signed out successfully");
-                    window.location.href = "login.html";
-                })
-                .catch((error) => {
-                    console.error("Logout error:", error);
-                    alert("حدث خطأ أثناء تسجيل الخروج: " + error.message);
-                });
+            signOut(auth).then(() => {
+                window.location.href = "login.html";
+            }).catch((error) => {
+                alert("خطأ في تسجيل الخروج: " + error.message);
+            });
         };
     </script>
 
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-        }
-        body {
-            background: #f9fafb;
-            color: #111827;
-            line-height: 1.6;
-        }
-        header {
-            background: #6d28d9;
-            color: white;
-            padding: 1.1rem 5%;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-        h1 {
-            font-size: 1.95rem;
-            font-weight: 700;
-        }
-        nav {
-            display: flex;
-            align-items: center;
-            gap: 1.8rem;
-            flex-wrap: wrap;
-        }
-        nav a {
-            color: white;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.25s;
-        }
-        nav a:hover {
-            color: #ddd6fe;
-        }
-        #user-email {
-            color: #e0e7ff;
-            font-weight: 500;
-            font-size: 0.95rem;
-            background: rgba(255,255,255,0.15);
-            padding: 0.4rem 0.9rem;
-            border-radius: 8px;
-            display: none;
-        }
-        #logout-btn {
-            background: rgba(255,255,255,0.2);
-            color: white;
-            border: none;
-            padding: 0.5rem 1.1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: background 0.2s;
-            display: none;
-        }
-        #logout-btn:hover {
-            background: rgba(255,255,255,0.35);
-        }
-        #login-link {
-            color: white;
-            text-decoration: none;
-            font-weight: 500;
-        }
-        .hero {
-            background: linear-gradient(135deg, #6d28d9 0%, #8b5cf6 100%);
-            color: white;
-            text-align: center;
-            padding: 7.5rem 5% 6rem;
-        }
-        .hero h2 {
-            font-size: 2.9rem;
-            margin-bottom: 1.1rem;
-            font-weight: 700;
-        }
-        .hero p {
-            font-size: 1.3rem;
-            max-width: 720px;
-            margin: 0 auto;
-            opacity: 0.92;
-        }
-        main {
-            max-width: 1300px;
-            margin: 0 auto;
-            padding: 0 5%;
-        }
-        .search-and-filters {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            align-items: center;
-            gap: 1.2rem 2rem;
-            margin: 2.5rem 0 3.5rem;
-        }
-        .search-container {
-            position: relative;
-            width: 100%;
-            max-width: 380px;
-        }
-        #searchInput {
-            width: 100%;
-            padding: 0.9rem 1rem 0.9rem 3rem;
-            border: 1px solid #d1d5db;
-            border-radius: 999px;
-            font-size: 1rem;
-            background: white;
-        }
-        .search-icon {
-            position: absolute;
-            left: 1.1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #9ca3af;
-            font-size: 1.3rem;
-        }
-        .filters {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 0.6rem;
-        }
-        .filter-btn {
-            background: #e5e7eb;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            margin: 0.2rem;
-            border-radius: 999px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.25s;
-        }
-        .filter-btn.active,
-        .filter-btn:hover {
-            background: #6d28d9;
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(109,40,217,0.25);
-        }
-        .products {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(285px, 1fr));
-            gap: 2rem;
-            margin-bottom: 5rem;
-        }
-        .product-card {
-            background: white;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-            transition: all 0.3s ease;
-        }
-        .product-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 16px 40px rgba(109,40,217,0.2);
-        }
-        .product-card img {
-            width: 100%;
-            height: 225px;
-            object-fit: contain;
-            background: #f3f4f6;
-            padding: 1.6rem;
-        }
-        .product-info {
-            padding: 1.4rem 1.5rem 1.8rem;
-            text-align: center;
-        }
-        .product-info h3 {
-            font-size: 1.28rem;
-            margin-bottom: 0.6rem;
-            font-weight: 600;
-        }
-        .type-badge {
-            display: inline-block;
-            background: #ede9fe;
-            color: #6d28d9;
-            padding: 0.35rem 0.9rem;
-            border-radius: 999px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            margin-bottom: 0.4rem;
-        }
-        .sales-count {
-            font-size: 0.95rem;
-            color: #7c3aed;
-            font-weight: 600;
-            margin-bottom: 0.6rem;
-            background: rgba(124, 58, 237, 0.1);
-            padding: 0.35rem 0.9rem;
-            border-radius: 999px;
-            display: inline-block;
-        }
-        .price {
-            font-size: 1.45rem;
-            font-weight: 700;
-            color: #059669;
-            margin: 0.6rem 0 1rem;
-        }
-        .buy-btn-container {
-            width: 100%;
-            min-height: 50px;
-        }
-        .upload-section {
-            background: white;
-            border-radius: 20px;
-            padding: 3.2rem;
-            box-shadow: 0 10px 35px rgba(0,0,0,0.08);
-            margin: 5rem auto;
-            max-width: 820px;
-        }
-        .upload-section h2 {
-            text-align: center;
-            color: #111827;
-            margin-bottom: 1.8rem;
-            font-size: 2.1rem;
-        }
-        .form-group {
-            margin-bottom: 2rem;
-        }
-        label {
-            display: block;
-            margin-bottom: 0.7rem;
-            font-weight: 600;
-            color: #374151;
-        }
-        .upload-area {
-            border: 2px dashed #9ca3af;
-            border-radius: 12px;
-            padding: 2.5rem 1.5rem;
-            text-align: center;
-            background: #f9fafb;
-            transition: all 0.25s ease;
-            cursor: pointer;
-            min-height: 160px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-        .upload-area:hover,
-        .upload-area.dragover {
-            border-color: #6d28d9;
-            background: #f3e8ff;
-            box-shadow: 0 0 0 3px rgba(109,40,217,0.12);
-        }
-        .upload-area .icon {
-            font-size: 3.2rem;
-            margin-bottom: 1rem;
-            color: #9ca3af;
-        }
-        .upload-area p {
-            margin: 0.4rem 0;
-            color: #4b5563;
-        }
-        .upload-area .hint {
-            font-size: 0.875rem;
-            color: #6b7280;
-            margin-top: 0.5rem;
-        }
-        .file-name {
-            margin-top: 1rem;
-            color: #059669;
-            font-weight: 500;
-            font-size: 0.95rem;
-            word-break: break-all;
-        }
-        input[type="file"] {
-            display: none;
-        }
-        input[type="text"],
-        textarea,
-        select,
-        input[type="number"] {
-            width: 100%;
-            padding: 0.95rem 1.3rem;
-            border: 1px solid #d1d5db;
-            border-radius: 10px;
-            font-size: 1rem;
-        }
-        textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
-        .submit-btn {
-            background: #10b981;
-            color: white;
-            border: none;
-            padding: 1.1rem 2.8rem;
-            border-radius: 999px;
-            font-size: 1.12rem;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 2rem;
-            transition: background 0.3s;
-        }
-        .submit-btn:hover:not(:disabled) {
-            background: #059669;
-        }
-        .submit-btn:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-        footer {
-            background: #111827;
-            color: #d1d5db;
-            text-align: center;
-            padding: 3rem 1rem;
-            margin-top: 6rem;
-        }
-        @media (max-width: 768px) {
-            .hero h2 { font-size: 2.3rem; }
-            .hero p { font-size: 1.15rem; }
-            nav { flex-wrap: wrap; gap: 1rem; justify-content: center; }
-            .search-and-filters { flex-direction: column; gap: 1.5rem; }
-        }
+        /* كل الـ style الأصلي بدون تغيير */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+        body { background: #f9fafb; color: #111827; line-height: 1.6; }
+        header { background: #6d28d9; color: white; padding: 1.1rem 5%; box-shadow: 0 2px 12px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+        .container { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+        h1 { font-size: 1.95rem; font-weight: 700; }
+        nav { display: flex; align-items: center; gap: 1.8rem; flex-wrap: wrap; }
+        nav a { color: white; text-decoration: none; font-weight: 500; transition: color 0.25s; }
+        nav a:hover { color: #ddd6fe; }
+        #user-email { color: #e0e7ff; font-weight: 500; font-size: 0.95rem; background: rgba(255,255,255,0.15); padding: 0.4rem 0.9rem; border-radius: 8px; display: none; }
+        #logout-btn { background: rgba(255,255,255,0.2); color: white; border: none; padding: 0.5rem 1.1rem; border-radius: 8px; cursor: pointer; font-weight: 500; transition: background 0.2s; display: none; }
+        #logout-btn:hover { background: rgba(255,255,255,0.35); }
+        #login-link { color: white; text-decoration: none; font-weight: 500; }
+        .hero { background: linear-gradient(135deg, #6d28d9 0%, #8b5cf6 100%); color: white; text-align: center; padding: 7.5rem 5% 6rem; }
+        .hero h2 { font-size: 2.9rem; margin-bottom: 1.1rem; font-weight: 700; }
+        .hero p { font-size: 1.3rem; max-width: 720px; margin: 0 auto; opacity: 0.92; }
+        main { max-width: 1300px; margin: 0 auto; padding: 0 5%; }
+        .search-and-filters { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 1.2rem 2rem; margin: 2.5rem 0 3.5rem; }
+        .search-container { position: relative; width: 100%; max-width: 380px; }
+        #searchInput { width: 100%; padding: 0.9rem 1rem 0.9rem 3rem; border: 1px solid #d1d5db; border-radius: 999px; font-size: 1rem; background: white; }
+        .search-icon { position: absolute; left: 1.1rem; top: 50%; transform: translateY(-50%); color: #9ca3af; font-size: 1.3rem; }
+        .filters { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.6rem; }
+        .filter-btn { background: #e5e7eb; border: none; padding: 0.75rem 1.5rem; margin: 0.2rem; border-radius: 999px; cursor: pointer; font-weight: 500; transition: all 0.25s; }
+        .filter-btn.active, .filter-btn:hover { background: #6d28d9; color: white; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(109,40,217,0.25); }
+        .products { display: grid; grid-template-columns: repeat(auto-fill, minmax(285px, 1fr)); gap: 2rem; margin-bottom: 5rem; }
+        .product-card { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.08); transition: all 0.3s ease; }
+        .product-card:hover { transform: translateY(-10px); box-shadow: 0 16px 40px rgba(109,40,217,0.2); }
+        .product-card img { width: 100%; height: 225px; object-fit: contain; background: #f3f4f6; padding: 1.6rem; }
+        .product-info { padding: 1.4rem 1.5rem 1.8rem; text-align: center; }
+        .product-info h3 { font-size: 1.28rem; margin-bottom: 0.6rem; font-weight: 600; }
+        .type-badge { display: inline-block; background: #ede9fe; color: #6d28d9; padding: 0.35rem 0.9rem; border-radius: 999px; font-size: 0.9rem; font-weight: 500; margin-bottom: 0.4rem; }
+        .sales-count { font-size: 0.95rem; color: #7c3aed; font-weight: 600; margin-bottom: 0.6rem; background: rgba(124, 58, 237, 0.1); padding: 0.35rem 0.9rem; border-radius: 999px; display: inline-block; }
+        .price { font-size: 1.45rem; font-weight: 700; color: #059669; margin: 0.6rem 0 1rem; }
+        .buy-btn-container { width: 100%; min-height: 50px; }
+        .upload-section { background: white; border-radius: 20px; padding: 3.2rem; box-shadow: 0 10px 35px rgba(0,0,0,0.08); margin: 5rem auto; max-width: 820px; }
+        .upload-section h2 { text-align: center; color: #111827; margin-bottom: 1.8rem; font-size: 2.1rem; }
+        .form-group { margin-bottom: 2rem; }
+        label { display: block; margin-bottom: 0.7rem; font-weight: 600; color: #374151; }
+        .upload-area { border: 2px dashed #9ca3af; border-radius: 12px; padding: 2.5rem 1.5rem; text-align: center; background: #f9fafb; transition: all 0.25s ease; cursor: pointer; min-height: 160px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .upload-area:hover, .upload-area.dragover { border-color: #6d28d9; background: #f3e8ff; box-shadow: 0 0 0 3px rgba(109,40,217,0.12); }
+        .upload-area .icon { font-size: 3.2rem; margin-bottom: 1rem; color: #9ca3af; }
+        .upload-area p { margin: 0.4rem 0; color: #4b5563; }
+        .upload-area .hint { font-size: 0.875rem; color: #6b7280; margin-top: 0.5rem; }
+        .file-name { margin-top: 1rem; color: #059669; font-weight: 500; font-size: 0.95rem; word-break: break-all; }
+        input[type="file"] { display: none; }
+        input[type="text"], textarea, select, input[type="number"] { width: 100%; padding: 0.95rem 1.3rem; border: 1px solid #d1d5db; border-radius: 10px; font-size: 1rem; }
+        textarea { min-height: 120px; resize: vertical; }
+        .submit-btn { background: #10b981; color: white; border: none; padding: 1.1rem 2.8rem; border-radius: 999px; font-size: 1.12rem; font-weight: 600; cursor: pointer; width: 100%; margin-top: 2rem; transition: background 0.3s; }
+        .submit-btn:hover:not(:disabled) { background: #059669; }
+        .submit-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+        footer { background: #111827; color: #d1d5db; text-align: center; padding: 3rem 1rem; margin-top: 6rem; }
+        @media (max-width: 768px) { .hero h2 { font-size: 2.3rem; } .hero p { font-size: 1.15rem; } nav { flex-wrap: wrap; gap: 1rem; justify-content: center; } .search-and-filters { flex-direction: column; gap: 1.5rem; } }
     </style>
 </head>
 <body>
@@ -544,6 +263,7 @@
                 const price = Number(p.price).toFixed(2);
                 const name = p.name;
                 const salesCount = p.salesCount || 0;
+                const fileUrl = p.fileUrl || ''; // للـ fallback
                 card.innerHTML = `
                     <img src="${p.previewImage || 'https://via.placeholder.com/300x225?text=Preview'}" alt="${name}">
                     <div class="product-info">
@@ -556,7 +276,6 @@
                 `;
                 container.appendChild(card);
 
-                // إنشاء زر PayPal ديناميكي لكل منتج
                 paypal.Buttons({
                     createOrder: function(data, actions) {
                         return actions.order.create({
@@ -571,9 +290,9 @@
                     },
                     onApprove: function(data, actions) {
                         return actions.order.capture().then(function(details) {
-                            alert('الدفع نجح في PayPal! شكراً لك، ' + details.payer.name.given_name);
+                            alert('الدفع نجح في PayPal! شكراً لك، ' + (details.payer.name.given_name || 'العميل'));
                             
-                            // محاولة تسجيل الدفع في الـ backend
+                            // محاولة تسجيل الدفع وجلب رابط التحميل
                             fetch('https://backend-creovea.onrender.com/record-payment', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
@@ -584,29 +303,35 @@
                                     amount: price
                                 })
                             })
-                            .then(response => {
-                                if (!response.ok) {
-                                    throw new Error('Backend response not ok: ' + response.status);
-                                }
-                                return response.json();
-                            })
+                            .then(response => response.json())
                             .then(result => {
                                 if (result.downloadUrl) {
                                     alert('جاري التحميل تلقائياً...');
                                     window.location.href = result.downloadUrl;
                                 } else {
-                                    alert('الدفع نجح! رابط التحميل هيتبعت قريب (تحقق من الإيميل أو جرب تاني).');
+                                    alert('الدفع نجح! لكن الرابط مش متوفر حالياً. جرب تحديث الصفحة.');
+                                    // fallback تحميل مباشر لو عندك fileUrl
+                                    if (fileUrl) {
+                                        const fallbackUrl = fileUrl.replace('/upload/', '/upload/fl_attachment/');
+                                        window.location.href = fallbackUrl;
+                                    }
                                 }
                             })
                             .catch(err => {
                                 console.error('Backend error:', err);
-                                alert('الدفع نجح في PayPal! لكن حصل خطأ في تسجيل الدفع أو الحصول على الرابط. جرب تحديث الصفحة أو تواصل معي.');
+                                alert('الدفع نجح في PayPal! لكن حصل خطأ في تسجيل الدفع. التحميل هيحصل يدوياً قريب.');
+                                // fallback تحميل مباشر
+                                if (fileUrl) {
+                                    const fallbackUrl = fileUrl.replace('/upload/', '/upload/fl_attachment/');
+                                    alert('جاري التحميل الآن...');
+                                    window.location.href = fallbackUrl;
+                                }
                             });
                         });
                     },
                     onError: function(err) {
                         console.error('PayPal SDK error:', err);
-                        alert('فشل الدفع في PayPal. جرب تاني أو استخدم طريقة دفع أخرى.');
+                        alert('فشل الدفع في PayPal. جرب تاني أو استخدم طريقة أخرى.');
                     }
                 }).render(`#paypal-button-${productId}`);
             });
