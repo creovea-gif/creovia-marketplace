@@ -538,7 +538,7 @@
                 const price = Number(p.price).toFixed(2);
                 const name = p.name;
                 const salesCount = p.salesCount || 0;
-                const fileUrl = p.fileUrl || ''; // للـ fallback
+                const fileUrl = p.fileUrl || '';
                 card.innerHTML = `
                     <img src="${p.previewImage || 'https://via.placeholder.com/300x225?text=Preview'}" alt="${name}">
                     <div class="product-info">
@@ -553,6 +553,7 @@
 
                 paypal.Buttons({
                     createOrder: function(data, actions) {
+                        console.log('Creating order for', name, price);
                         return actions.order.create({
                             purchase_units: [{
                                 amount: {
@@ -564,16 +565,16 @@
                         });
                     },
                     onApprove: function(data, actions) {
+                        console.log('Order approved, capturing...');
                         return actions.order.capture().then(function(details) {
-                            alert('الدفع نجح في PayPal! شكراً لك، ' + (details.payer.name.given_name || 'العميل'));
+                            console.log('Capture successful:', details);
+                            alert('الدفع نجح تماماً في PayPal! شكراً لك، ' + (details.payer.name.given_name || 'العميل'));
                             
-                            // fallback رابط تحميل مباشر من Cloudinary (حتى لو فشل الـ backend)
                             let fallbackUrl = '';
                             if (fileUrl) {
                                 fallbackUrl = fileUrl.replace('/upload/', '/upload/fl_attachment/');
                             }
 
-                            // محاولة تسجيل الدفع في الـ backend
                             fetch('https://backend-creovea.onrender.com/record-payment', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
@@ -584,32 +585,41 @@
                                     amount: price
                                 })
                             })
-                            .then(response => response.json())
+                            .then(response => {
+                                console.log('Backend response status:', response.status);
+                                if (!response.ok) throw new Error('Backend error');
+                                return response.json();
+                            })
                             .then(result => {
+                                console.log('Backend result:', result);
                                 if (result.downloadUrl) {
                                     alert('جاري التحميل تلقائياً...');
                                     window.location.href = result.downloadUrl;
                                 } else {
-                                    alert('الدفع نجح! لكن رابط التحميل مش متوفر من الـ backend. جاري تحميل يدوي...');
-                                    if (fallbackUrl) {
-                                        window.location.href = fallbackUrl;
-                                    }
+                                    alert('الدفع نجح! رابط التحميل من الـ backend مش متوفر. جاري fallback...');
+                                    if (fallbackUrl) window.location.href = fallbackUrl;
                                 }
                             })
                             .catch(err => {
-                                console.error('Backend error:', err);
-                                alert('الدفع نجح في PayPal! لكن خطأ في الـ backend. جاري تحميل الملف يدوياً...');
+                                console.error('Backend fetch error:', err);
+                                alert('الدفع نجح في PayPal! لكن خطأ في الـ backend. جاري تحميل يدوي...');
                                 if (fallbackUrl) {
                                     window.location.href = fallbackUrl;
                                 } else {
-                                    alert('ما عنديش رابط تحميل fallback. تحقق من الـ backend أو جرب تاني.');
+                                    alert('ما عنديش رابط fallback. تحقق من Console أو جرب تاني.');
                                 }
                             });
+                        }).catch(captureErr => {
+                            console.error('Capture failed:', captureErr);
+                            alert('فشل في تأكيد الدفع داخل PayPal. جرب تاني أو تحقق من الحساب Sandbox.');
                         });
                     },
                     onError: function(err) {
                         console.error('PayPal SDK error:', err);
-                        alert('فشل الدفع في PayPal. جرب تاني أو استخدم طريقة أخرى.');
+                        alert('خطأ في PayPal SDK. تحقق من Console أو جرب تاني.');
+                    },
+                    onCancel: function(data) {
+                        alert('تم إلغاء الدفع.');
                     }
                 }).render(`#paypal-button-${productId}`);
             });
