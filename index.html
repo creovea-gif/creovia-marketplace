@@ -579,12 +579,10 @@
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({
-                                    productId: productId,
-                                    orderId: data.orderID,
-                                    payerEmail: details.payer.email_address,
-                                    amount: price
-                                })
-                            })
+  productId,
+  orderId
+})
+
                             .then(res => res.json())
                             .then(result => {
                                 if (result.downloadUrl) {
@@ -672,3 +670,4 @@
     </script>
 </body>
 </html>
+
