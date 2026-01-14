@@ -575,13 +575,15 @@
                             alert('Payment successful! Thank you, ' + details.payer.name.given_name);
                             
                             // تسجيل الدفع في الـ backend وزيادة المبيعات + الحصول على رابط تحميل
-                            fetch('https://backend-creovea.onrender.com/record-payment', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({
-  productId,
-  orderId
+                           fetch('https://backend-creovea.onrender.com/record-payment', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    productId: productId,
+    orderId: data.orderID
+  })
 })
+
 
                             .then(res => res.json())
                             .then(result => {
@@ -670,4 +672,5 @@
     </script>
 </body>
 </html>
+
 
