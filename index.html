@@ -7,8 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- PayPal JavaScript SDK (Sandbox للتجربة - غيّر إلى Live لاحقاً) -->
-   <script src="https://www.paypal.com/sdk/js?client-id=AR_2EtGAODL-SCx1a3EEQkZyeGapi-9qWuKZ4xNBO2vaAnSX0oy4SPI-0RwjSAULiOGa8iE9bNj3JQ7X&currency=USD&intent=capture&components=buttons"></script>
-
+    <script src="https://www.paypal.com/sdk/js?client-id=AR_2EtGAODL-SCx1a3EEQkZyeGapi-9qWuKZ4xNBO2vaAnSX0oy4SPI-0RwjSAULiOGa8iE9bNj3JQ7X&currency=USD"></script>
 
     <!-- Firebase SDK (modular) -->
     <script type="module">
@@ -519,23 +518,18 @@
         setupUploadArea('fileArea', 'fileInput', 'mainFileName');
         let allProducts = [];
         let currentFilter = 'all';
-       async function loadProducts() {
-    try {
-        const res = await fetch('https://backend-creovea.onrender.com/products');
-        if (!res.ok) throw new Error('Failed to fetch products');
-        const data = await res.json();
-        
-        // تأكد أن البيانات مصفوفة قبل الاستخدام
-        allProducts = Array.isArray(data) ? data : [];
-        
-        updateProductsDisplay();
-    } catch (err) {
-        console.error('Error:', err);
-        document.getElementById('productsContainer').innerHTML =
-            '<p style="text-align:center; color:#ef4444; grid-column:1/-1; font-size:1.2rem;">Unable to load products at the moment...</p>';
-    }
-}
-
+        async function loadProducts() {
+            try {
+                const res = await fetch('https://backend-creovea.onrender.com/products');
+                if (!res.ok) throw new Error('Failed to fetch products');
+                allProducts = await res.json();
+                updateProductsDisplay();
+            } catch (err) {
+                console.error('Error:', err);
+                document.getElementById('productsContainer').innerHTML =
+                    '<p style="text-align:center; color:#ef4444; grid-column:1/-1; font-size:1.2rem;">Unable to load products at the moment...</p>';
+            }
+        }
         function renderProducts(products) {
             const container = document.getElementById('productsContainer');
             container.innerHTML = '';
@@ -564,16 +558,14 @@
                 container.appendChild(card);
 
                 // إنشاء زر PayPal ديناميكي لكل منتج
-               if (window.paypal) {
-  paypal.Buttons({
-
+                paypal.Buttons({
                     createOrder: function(data, actions) {
                         return actions.order.create({
                             purchase_units: [{
                                 amount: {
-  value: price
-}
-
+                                    value: price,
+                                    currency_code: 'USD'
+                                },
                                 description: `Purchase of ${name}`
                             }]
                         });
@@ -583,16 +575,16 @@
                             alert('Payment successful! Thank you, ' + details.payer.name.given_name);
                             
                             // تسجيل الدفع في الـ backend وزيادة المبيعات + الحصول على رابط تحميل
-                           fetch('https://backend-creovea.onrender.com/record-payment', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    productId: productId,
-    orderId: data.orderID
-  })
-})
-
-
+                            fetch('https://backend-creovea.onrender.com/record-payment', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    productId: productId,
+                                    orderId: data.orderID,
+                                    payerEmail: details.payer.email_address,
+                                    amount: price
+                                })
+                            })
                             .then(res => res.json())
                             .then(result => {
                                 if (result.downloadUrl) {
@@ -611,9 +603,7 @@
                         console.error('PayPal error:', err);
                         alert('Payment failed. Please try again.');
                     }
-               }).render(`#paypal-button-${productId}`);
-}
-
+                }).render(`#paypal-button-${productId}`);
             });
         }
         function updateProductsDisplay() {
@@ -682,7 +672,3 @@
     </script>
 </body>
 </html>
-
-
-
-
