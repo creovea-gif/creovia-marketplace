@@ -609,27 +609,37 @@
 
 }).render(`#paypal-button-${productId}`); // ✅ هذا السطر كان ناقص
 
-        function updateProductsDisplay() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
-          
-            let filteredProducts = allProducts;
-            if (currentFilter !== 'all') {
-                filteredProducts = filteredProducts.filter(p => p.type === currentFilter);
-            }
-            if (searchTerm !== '') {
-                filteredProducts = filteredProducts.filter(p =>
-                    p.name.toLowerCase().includes(searchTerm)
-                );
-            }
-            renderProducts(filteredProducts);
-        }
-        function filterProducts(type) {
-            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            currentFilter = type;
-            updateProductsDisplay();
-        }
-        document.getElementById('searchInput').addEventListener('input', updateProductsDisplay);
+       }); // ← تأكد من أن هذا يغلق forEach
+
+// =================== الدوال العامة خارج forEach ===================
+function updateProductsDisplay() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+  
+    let filteredProducts = allProducts;
+    if (currentFilter !== 'all') {
+        filteredProducts = filteredProducts.filter(p => p.type === currentFilter);
+    }
+    if (searchTerm !== '') {
+        filteredProducts = filteredProducts.filter(p =>
+            p.name.toLowerCase().includes(searchTerm)
+        );
+    }
+    renderProducts(filteredProducts);
+}
+
+function filterProducts(type, event) {
+    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    currentFilter = type;
+    updateProductsDisplay();
+}
+
+// الربط مع البحث
+document.getElementById('searchInput').addEventListener('input', updateProductsDisplay);
+
+// تعديل زر الفلترة في HTML ليتمرر event
+// مثال: <button class="filter-btn" onclick="filterProducts('ebook', event)">Ebooks</button>
+
         document.getElementById('uploadForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const submitBtn = document.querySelector('.submit-btn');
@@ -675,6 +685,7 @@
     </script>
 </body>
 </html>
+
 
 
 
