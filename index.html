@@ -570,7 +570,9 @@
                             }]
                         });
                     },
-                    onApprove: async function (data, actions) {
+                   onApprove: async function (data, actions) {
+    await actions.order.get();
+
     try {
         // ❌ لا نعمل capture هنا
         // ✔️ السيرفر هو من يتحقق من الدفع
@@ -674,4 +676,5 @@ onError: function (err) {
     </script>
 </body>
 </html>
+
 
