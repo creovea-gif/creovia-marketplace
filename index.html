@@ -560,53 +560,49 @@
 
                 // إنشاء زر PayPal ديناميكي لكل منتج
                 paypal.Buttons({
-                    createOrder: function(data, actions) {
-                        return actions.order.create({
-                            purchase_units: [{
-                                amount: {
-                                    value: price,
-                                    currency_code: 'USD'
-                                },
-                                description: `Purchase of ${name}`
-                            }]
-                        });
-                    },
-                    onApprove: function(data, actions) {
-                        return actions.order.capture().then(function(details) {
-                            alert('Payment successful! Thank you, ' + details.payer.name.given_name);
-                            
-                            // تسجيل الدفع في الـ backend وزيادة المبيعات + الحصول على رابط تحميل
-                            fetch('https://backend-creovea.onrender.com/record-payment', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({
-                                    productId: productId,
-                                    orderId: data.orderID,
-                                    payerEmail: details.payer.email_address,
-                                    amount: price
-                                })
-                            })
-                            .then(res => res.json())
-                            .then(result => {
-                                if (result.downloadUrl) {
-                                    window.location.href = result.downloadUrl;
-                                } else {
-                                    alert('Payment recorded, download link will be sent soon.');
-                                }
-                            })
-                            .catch(err => {
-                                console.error(err);
-                                alert('Payment successful, but error getting download link.');
-                            });
-                        });
-                    },
-                    onError: function(err) {
-                        console.error('PayPal error:', err);
-                        alert('Payment failed. Please try again.');
-                    }
-                }).render(`#paypal-button-${productId}`);
-            });
-        }
+    createOrder: function (data, actions) {
+        return actions.order.create({
+            purchase_units: [{
+                amount: {
+                    value: price,
+                    currency_code: 'USD'
+                }
+            }]
+        });
+    },
+
+    onApprove: function (data, actions) {
+        return actions.order.capture().then(async function () {
+
+            const res = await fetch(
+                'https://backend-creovea.onrender.com/record-payment',
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        productId: productId,
+                        orderId: data.orderID
+                    })
+                }
+            );
+
+            const result = await res.json();
+
+            if (!result.success) {
+                alert('Payment verification failed');
+                return;
+            }
+
+            window.location.href = result.downloadUrl;
+        });
+    },
+
+    onError: function (err) {
+        console.error('PayPal error:', err);
+        alert('Payment failed. Please try again.');
+    }
+}).render(`#paypal-button-${productId}`);
+
         function updateProductsDisplay() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
           
@@ -673,4 +669,5 @@
     </script>
 </body>
 </html>
+
 
