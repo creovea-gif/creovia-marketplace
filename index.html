@@ -532,6 +532,8 @@
             }
         }
         function renderProducts(products) {
+            console.log('renderProducts called with:', products.length);
+
             const container = document.getElementById('productsContainer');
             container.innerHTML = '';
             if (products.length === 0) {
@@ -559,6 +561,7 @@
                 container.appendChild(card);
 
                 // إنشاء زر PayPal ديناميكي لكل منتج
+              /*
                 paypal.Buttons({
     createOrder: function (data, actions) {
         return actions.order.create({
@@ -602,6 +605,7 @@
         alert('Payment failed. Please try again.');
     }
 }).render(`#paypal-button-${productId}`);
+                */
 
         function updateProductsDisplay() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
@@ -677,6 +681,7 @@
     </script>
 </body>
 </html>
+
 
 
 
