@@ -558,58 +558,57 @@
                 container.appendChild(card);
 
                 // إنشاء زر PayPal ديناميكي لكل منتج
-                paypal.Buttons({
-                    createOrder: function(data, actions) {
-                        return actions.order.create({
-                            purchase_units: [{
-                                amount: {
-                                    value: price,
-                                    currency_code: 'USD'
-                                },
-                                description: `Purchase of ${name}`
-                            }]
-                        });
-                    },
-                   onApprove: async function (data, actions) {
-    await actions.order.get();
+               paypal.Buttons({
+    createOrder: function (data, actions) {
+        return actions.order.create({
+            purchase_units: [{
+                amount: {
+                    value: price,
+                    currency_code: 'USD'
+                },
+                description: `Purchase of ${name}`
+            }]
+        });
+    },
 
-    try {
-        // ❌ لا نعمل capture هنا
-        // ✔️ السيرفر هو من يتحقق من الدفع
+    onApprove: async function (data, actions) {
+        try {
+            // ⚠️ لا نعمل capture هنا (السيرفر هو المسؤول)
+            const res = await fetch(
+                'https://backend-creovea.onrender.com/record-payment',
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        productId: productId,
+                        orderId: data.orderID
+                    })
+                }
+            );
 
-        const res = await fetch(
-            'https://backend-creovea.onrender.com/record-payment',
-            {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    productId: productId,
-                    orderId: data.orderID
-                })
+            const result = await res.json();
+
+            if (!result.success || !result.downloadUrl) {
+                alert('Payment failed. Please try again.');
+                return;
             }
-        );
 
-        const result = await res.json();
+            // ✅ التحميل بعد التأكد من السيرفر
+            window.location.href = result.downloadUrl;
 
-        if (!result.success || !result.downloadUrl) {
+        } catch (err) {
+            console.error(err);
             alert('Payment failed. Please try again.');
-            return;
         }
+    },
 
-        // ✅ التحميل مباشرة بعد التأكد من الدفع
-        window.location.href = result.downloadUrl;
-
-    } catch (err) {
-        console.error(err);
+    onError: function (err) {
+        console.error('PayPal error:', err);
         alert('Payment failed. Please try again.');
     }
-},
-onError: function (err) {
-    console.error('PayPal error:', err);
-    alert('Payment failed. Please try again.');
-}
 
-        }
+}).render(`#paypal-button-${productId}`); // ✅ هذا السطر كان ناقص
+
         function updateProductsDisplay() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
           
@@ -676,5 +675,6 @@ onError: function (err) {
     </script>
 </body>
 </html>
+
 
 
