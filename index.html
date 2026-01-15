@@ -482,7 +482,7 @@
         <p>© 2026 CREOVIA — All Rights Reserved</p>
     </footer>
     <script>
-       function setupUploadArea(areaId, inputId, nameDisplayId) {
+        function setupUploadArea(areaId, inputId, nameDisplayId) {
             const area = document.getElementById(areaId);
             const input = document.getElementById(inputId);
             const nameDisplay = document.getElementById(nameDisplayId);
@@ -558,88 +558,75 @@
                 container.appendChild(card);
 
                 // إنشاء زر PayPal ديناميكي لكل منتج
-               paypal.Buttons({
-    createOrder: function (data, actions) {
-        return actions.order.create({
-            purchase_units: [{
-                amount: {
-                    value: price,
-                    currency_code: 'USD'
-                },
-                description: `Purchase of ${name}`
-            }]
-        });
-    },
-
-    onApprove: async function (data, actions) {
-        try {
-            // ⚠️ لا نعمل capture هنا (السيرفر هو المسؤول)
-            const res = await fetch(
-                'https://backend-creovea.onrender.com/record-payment',
-                {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        productId: productId,
-                        orderId: data.orderID
-                    })
-                }
-            );
-
-            const result = await res.json();
-
-            if (!result.success || !result.downloadUrl) {
-                alert('Payment failed. Please try again.');
-                return;
-            }
-
-            // ✅ التحميل بعد التأكد من السيرفر
-            window.location.href = result.downloadUrl;
-
-        } catch (err) {
-            console.error(err);
-            alert('Payment failed. Please try again.');
+                paypal.Buttons({
+                    createOrder: function(data, actions) {
+                        return actions.order.create({
+                            purchase_units: [{
+                                amount: {
+                                    value: price,
+                                    currency_code: 'USD'
+                                },
+                                description: `Purchase of ${name}`
+                            }]
+                        });
+                    },
+                    onApprove: function(data, actions) {
+                        return actions.order.capture().then(function(details) {
+                            alert('Payment successful! Thank you, ' + details.payer.name.given_name);
+                            
+                            // تسجيل الدفع في الـ backend وزيادة المبيعات + الحصول على رابط تحميل
+                            fetch('https://backend-creovea.onrender.com/record-payment', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    productId: productId,
+                                    orderId: data.orderID,
+                                    payerEmail: details.payer.email_address,
+                                    amount: price
+                                })
+                            })
+                            .then(res => res.json())
+                            .then(result => {
+                                if (result.downloadUrl) {
+                                    window.location.href = result.downloadUrl;
+                                } else {
+                                    alert('Payment recorded, download link will be sent soon.');
+                                }
+                            })
+                            .catch(err => {
+                                console.error(err);
+                                alert('Payment successful, but error getting download link.');
+                            });
+                        });
+                    },
+                    onError: function(err) {
+                        console.error('PayPal error:', err);
+                        alert('Payment failed. Please try again.');
+                    }
+                }).render(`#paypal-button-${productId}`);
+            });
         }
-    },
-
-    onError: function (err) {
-        console.error('PayPal error:', err);
-        alert('Payment failed. Please try again.');
-    }
-
-}).render(`#paypal-button-${productId}`); // ✅ هذا السطر كان ناقص
-
-       }); // ← تأكد من أن هذا يغلق forEach
-
-// =================== الدوال العامة خارج forEach ===================
-function updateProductsDisplay() {
-    const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
-  
-    let filteredProducts = allProducts;
-    if (currentFilter !== 'all') {
-        filteredProducts = filteredProducts.filter(p => p.type === currentFilter);
-    }
-    if (searchTerm !== '') {
-        filteredProducts = filteredProducts.filter(p =>
-            p.name.toLowerCase().includes(searchTerm)
-        );
-    }
-    renderProducts(filteredProducts);
-}
-
-function filterProducts(type, event) {
-    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
-    currentFilter = type;
-    updateProductsDisplay();
-}
-
-// الربط مع البحث
-document.getElementById('searchInput').addEventListener('input', updateProductsDisplay);
-
-// تعديل زر الفلترة في HTML ليتمرر event
-// مثال: <button class="filter-btn" onclick="filterProducts('ebook', event)">Ebooks</button>
-
+        function updateProductsDisplay() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+          
+            let filteredProducts = allProducts;
+            if (currentFilter !== 'all') {
+                filteredProducts = filteredProducts.filter(p => p.type === currentFilter);
+            }
+            if (searchTerm !== '') {
+                filteredProducts = filteredProducts.filter(p =>
+                    p.name.toLowerCase().includes(searchTerm)
+                );
+            }
+            renderProducts(filteredProducts);
+        }
+        function filterProducts(type) {
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            currentFilter = type;
+            updateProductsDisplay();
+        }
+        document.getElementById('searchInput').addEventListener('input', updateProductsDisplay);
         document.getElementById('uploadForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const submitBtn = document.querySelector('.submit-btn');
@@ -685,8 +672,3 @@ document.getElementById('searchInput').addEventListener('input', updateProductsD
     </script>
 </body>
 </html>
-
-
-
-
-
