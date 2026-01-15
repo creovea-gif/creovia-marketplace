@@ -617,12 +617,20 @@
             }
             renderProducts(filteredProducts);
         }
-        function filterProducts(type) {
-            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            currentFilter = type;
-            updateProductsDisplay();
+       function filterProducts(type) {
+    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+
+    // تفعيل الزر الصحيح بدون event
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        if (btn.textContent.toLowerCase().includes(type) || type === 'all') {
+            btn.classList.add('active');
         }
+    });
+
+    currentFilter = type;
+    updateProductsDisplay();
+}
+
         document.getElementById('searchInput').addEventListener('input', updateProductsDisplay);
         document.getElementById('uploadForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -669,5 +677,6 @@
     </script>
 </body>
 </html>
+
 
 
