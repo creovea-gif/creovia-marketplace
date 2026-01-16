@@ -680,7 +680,9 @@ card.innerHTML = `
         submitBtn.style.cursor = "pointer";
         return;
     }
-    formData.append('sellerEmail', auth.currentUser.email);
+    const sellerEmail = auth.currentUser?.email || 'unknown@example.com';
+formData.append('sellerEmail', sellerEmail);
+
 
     try {
         const response = await fetch('https://backend-creovea.onrender.com/upload', {
@@ -712,6 +714,7 @@ card.innerHTML = `
     </script>
 </body>
 </html>
+
 
 
 
