@@ -653,13 +653,32 @@ card.innerHTML = `
             submitBtn.style.opacity = "0.7";
             submitBtn.style.cursor = "not-allowed";
             const formData = new FormData();
-         
+
+const previewFile = document.getElementById('previewImage').files[0];
+const mainFile = document.getElementById('fileInput').files[0];
+
+if (!previewFile || !mainFile) {
+    alert('Please select both preview image and main file.');
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalText;
+    return;
+}
+            
             formData.append('preview', document.getElementById('previewImage').files[0]);
             formData.append('file', document.getElementById('fileInput').files[0]);
             formData.append('name', document.getElementById('productName').value.trim());
             formData.append('desc', document.getElementById('productDesc').value.trim());
             formData.append('type', document.getElementById('productType').value);
             formData.append('price', document.getElementById('productPrice').value);
+
+if (!auth.currentUser) {
+    alert('You must be logged in to upload a product.');
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalText;
+    return;
+}
+
+            
             formData.append('sellerEmail', auth.currentUser.email); // ← هذا السطر الجديد
 
             try {
@@ -691,6 +710,7 @@ card.innerHTML = `
     </script>
 </body>
 </html>
+
 
 
 
