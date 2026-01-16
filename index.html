@@ -14,6 +14,7 @@
 
     <!-- Firebase SDK (modular) -->
     <script type="module">
+          window.currentUser = null;
         // Firebase Configuration (من مشروعك)
         const firebaseConfig = {
             apiKey: "AIzaSyCh2Pf1c1Gb7fQCQy64WmNYvWBKffwiuOs",
@@ -34,22 +35,24 @@
         const auth = getAuth(app);
         // مراقبة حالة تسجيل الدخول
         onAuthStateChanged(auth, (user) => {
-            const userEmailElement = document.getElementById("user-email");
-            const logoutBtn = document.getElementById("logout-btn");
-            const loginLink = document.getElementById("login-link");
-            if (user) {
-                // المستخدم مسجل دخول → إظهار الإيميل + زر Logout
-                userEmailElement.textContent = user.email;
-                userEmailElement.style.display = "inline";
-                logoutBtn.style.display = "inline-block";
-                loginLink.style.display = "none";
-            } else {
-                // غير مسجل → إخفاء الإيميل و Logout، إظهار Login
-                userEmailElement.style.display = "none";
-                logoutBtn.style.display = "none";
-                loginLink.style.display = "inline";
-            }
-        });
+    window.currentUser = user; // ✅ نحفظ المستخدم عالميًا
+
+    const userEmailElement = document.getElementById("user-email");
+    const logoutBtn = document.getElementById("logout-btn");
+    const loginLink = document.getElementById("login-link");
+
+    if (user) {
+        userEmailElement.textContent = user.email;
+        userEmailElement.style.display = "inline";
+        logoutBtn.style.display = "inline-block";
+        loginLink.style.display = "none";
+    } else {
+        userEmailElement.style.display = "none";
+        logoutBtn.style.display = "none";
+        loginLink.style.display = "inline";
+    }
+});
+
         // دالة تسجيل الخروج (تم التأكد من عملها)
         window.handleLogout = function() {
             signOut(auth)
@@ -660,7 +663,17 @@ card.innerHTML = `
             formData.append('desc', document.getElementById('productDesc').value.trim());
             formData.append('type', document.getElementById('productType').value);
             formData.append('price', document.getElementById('productPrice').value);
-            formData.append('sellerEmail', auth.currentUser.email); // ← هذا السطر الجديد
+           if (!window.currentUser) {
+    alert('You must be logged in to upload a product.');
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalText;
+    submitBtn.style.opacity = "1";
+    submitBtn.style.cursor = "pointer";
+    return;
+}
+
+formData.append('sellerEmail', window.currentUser.email);
+
 
             try {
                 const response = await fetch('https://backend-creovea.onrender.com/upload', {
@@ -691,6 +704,7 @@ card.innerHTML = `
     </script>
 </body>
 </html>
+
 
 
 
