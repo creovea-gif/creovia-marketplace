@@ -31,11 +31,26 @@
             onAuthStateChanged,
             signOut
         } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+const db = getFirestore(app);
+
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         // مراقبة حالة تسجيل الدخول
         onAuthStateChanged(auth, (user) => {
     window.currentUser = user; // ✅ نحفظ المستخدم عالميًا
+
+            async function getUsernameByEmail(email) {
+    if (!email) return "Unknown";
+    try {
+        const docRef = doc(db, "users", email);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) return docSnap.data().username || email;
+        return email;
+    } catch {
+        return email;
+    }
+}
 
     const userEmailElement = document.getElementById("user-email");
     const logoutBtn = document.getElementById("logout-btn");
@@ -545,6 +560,21 @@
             }
         }
         function renderProducts(products) {
+           
+            
+            async function getUsernameByEmail(email) {
+    if (!email) return "Unknown";
+    try {
+        const docRef = doc(db, "users", email); // collection "users" و document id = email
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) return docSnap.data().username || email;
+        return email;
+    } catch (err) {
+        console.error("Error fetching username:", err);
+        return email;
+    }
+}
+
             console.log('renderProducts called with:', products.length);
 
             const container = document.getElementById('productsContainer');
@@ -566,7 +596,8 @@ card.addEventListener('click', () => {
                 const name = p.name;
                 const salesCount = p.salesCount || 0;
 
-                const sellerName = p.seller || 'Unknown';
+               const sellerName = await getUsernameByEmail(p.seller);
+
 
 card.innerHTML = `
     <img src="${p.previewImage || 'https://via.placeholder.com/300x225?text=Preview'}" alt="${name}">
@@ -709,6 +740,7 @@ formData.append('sellerEmail', window.currentUser.email);
     </script>
 </body>
 </html>
+
 
 
 
