@@ -392,6 +392,14 @@
             nav { flex-wrap: wrap; gap: 1rem; justify-content: center; }
             .search-and-filters { flex-direction: column; gap: 1.5rem; }
         }
+
+.seller-name {
+    font-size: 0.9rem;
+    color: #6b7280;
+    margin-top: 0.5rem;
+}
+
+        
     </style>
 </head>
 <body>
@@ -550,16 +558,20 @@
                 const name = p.name;
                 const salesCount = p.salesCount || 0;
 
-                card.innerHTML = `
-                    <img src="${p.previewImage || 'https://via.placeholder.com/300x225?text=Preview'}" alt="${name}">
-                    <div class="product-info">
-                        <h3>${name}</h3>
-                        <span class="type-badge">${p.type || 'Unknown'}</span>
-                        <div class="sales-count">Sales: ${salesCount}</div>
-                        <div class="price">$${price}</div>
-                        <div class="buy-btn-container" id="paypal-button-${productId}"></div>
-                    </div>
-                `;
+                const sellerName = p.seller || 'Unknown';
+
+card.innerHTML = `
+    <img src="${p.previewImage || 'https://via.placeholder.com/300x225?text=Preview'}" alt="${name}">
+    <div class="product-info">
+        <h3>${name}</h3>
+        <span class="type-badge">${p.type || 'Unknown'}</span>
+        <div class="sales-count">Sales: ${salesCount}</div>
+        <div class="price">$${price}</div>
+        <div class="seller-name" style="margin-top:0.5rem; font-size:0.9rem; color:#6b7280;">By: ${sellerName}</div>
+        <div class="buy-btn-container" id="paypal-button-${productId}"></div>
+    </div>
+`;
+
                 container.appendChild(card);
 
                 // إنشاء زر PayPal ديناميكي لكل منتج
@@ -648,6 +660,8 @@
             formData.append('desc', document.getElementById('productDesc').value.trim());
             formData.append('type', document.getElementById('productType').value);
             formData.append('price', document.getElementById('productPrice').value);
+            formData.append('sellerEmail', auth.currentUser.email); // ← هذا السطر الجديد
+
             try {
                 const response = await fetch('https://backend-creovea.onrender.com/upload', {
                     method: 'POST',
@@ -677,6 +691,7 @@
     </script>
 </body>
 </html>
+
 
 
 
