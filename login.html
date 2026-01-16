@@ -78,14 +78,7 @@
             
             try {
               await createUserWithEmailAndPassword(auth, email, password);
-              import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-const db = getFirestore(app);
-
-// حفظ الاسم مع الإيميل
-await setDoc(doc(db, "users", email), {
-    username: document.getElementById("username").value.trim(),
-    email: email
-});
+             
 
               statusText.textContent = "Account created! Logging you in...";
               setTimeout(() => {
