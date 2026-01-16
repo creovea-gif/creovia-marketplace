@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Product</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+    padding: 20px;
+}
+.card {
+    max-width: 700px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+}
+img {
+    width: 100%;
+    border-radius: 8px;
+}
+.buy-btn {
+    margin-top: 15px;
+    padding: 12px;
+    width: 100%;
+    border: none;
+    background: #6366f1;
+    color: white;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+</style>
+</head>
+<body>
+
+<div class="card">
+    <h2 id="name"></h2>
+    <p id="seller"></p>
+    <img id="image">
+    <p id="desc"></p>
+    <h3 id="price"></h3>
+
+    <!-- زر PayPal -->
+    <div id="paypal-button-container"></div>
+</div>
+
+  <script src="https://www.paypal.com/sdk/js?client-id=Ady-fs_MNNG5Ue22tNNapD9abvFULboMBDy5vAbpDYt8jCVNkqeyS1hssK58OTIWLWQt5xHxZlcZ_hSB&currency=USD&intent=capture"></script>
+<script>
+const params = new URLSearchParams(window.location.search);
+const productId = params.get('id');
+
+if (!productId) {
+    alert('Product not found');
+}
+
+// جلب بيانات المنتج
+fetch('https://backend-creovea.onrender.com/products')
+.then(res => res.json())
+.then(products => {
+    const product = products.find(p => p.id === productId);
+    if (!product) return alert('Product not found');
+
+    document.getElementById('name').textContent = product.name;
+    document.getElementById('seller').textContent = 'Seller: ' + product.seller;
+    document.getElementById('desc').textContent = product.description;
+    document.getElementById('price').textContent = '$' + product.price;
+    document.getElementById('image').src = product.previewImage;
+
+    // PayPal
+    paypal.Buttons({
+        createOrder: (data, actions) => {
+            return actions.order.create({
+                purchase_units: [{
+                    amount: { value: product.price }
+                }]
+            });
+        },
+        onApprove: async (data) => {
+            const res = await fetch('https://backend-creovea.onrender.com/record-payment', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    productId: product.id,
+                    orderId: data.orderID
+                })
+            });
+            const result = await res.json();
+            if (result.success) {
+                window.location.href = result.downloadUrl;
+            } else {
+                alert('Payment failed');
+            }
+        }
+    }).render('#paypal-button-container');
+});
+</script>
+</body>
+</html>
