@@ -572,11 +572,16 @@
         });
     },
     onApprove: function(data, actions) {
-        // فقط إرسال orderId للسيرفر للتحقق
+        // ✅ هنا تأكد أن productId صحيح
+        console.log('Sending payment for productId:', productId); // هذا سيساعدك على تتبع
+
         return fetch('https://backend-creovea.onrender.com/record-payment', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ productId, orderId: data.orderID })
+            body: JSON.stringify({
+                productId: productId, // يجب أن يكون نفس الـ ID الموجود في Firestore
+                orderId: data.orderID
+            })
         })
         .then(res => res.json())
         .then(result => {
@@ -589,6 +594,7 @@
         alert('Payment failed. Please try again.');
     }
 }).render(`#paypal-button-${productId}`);
+
 
 
 
@@ -670,6 +676,7 @@
     </script>
 </body>
 </html>
+
 
 
 
