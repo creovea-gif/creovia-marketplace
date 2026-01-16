@@ -430,7 +430,8 @@
                 <a href="index.html">Home</a>
                 <a href="categories.html">Categories</a>
                 <a href="#upload-section">Upload</a>
-                <a href="dashboard.html">Dashboard</a>
+                <a href="#" onclick="goToDashboard()">Dashboard</a>
+
                 <a href="contact.html">Contact</a>
                 <span id="user-email"></span>
                 <button id="logout-btn" onclick="handleLogout()">Logout</button>
@@ -748,9 +749,22 @@ formData.append('sellerEmail', window.currentUser.email);
             }
         });
         loadProducts();
+   
+    <script>
+function goToDashboard() {
+    if (!window.currentUser) {
+        window.location.href = "login.html";
+    } else {
+        window.location.href = "dashboard.html";
+    }
+}
+</script>
+
+    
     </script>
 </body>
 </html>
+
 
 
 
