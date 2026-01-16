@@ -567,31 +567,34 @@
         purchase_units: [{ amount: { value: price, currency_code: 'USD' } }]
     }),
 
-    onApprove: async (data, actions) => {
-        try {
-            const res = await fetch('https://backend-creovea.onrender.com/record-payment', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ productId, orderId: data.orderID })
-            });
-            const result = await res.json();
+   onApprove: async function (data, actions) {
+    try {
+        // إرسال orderId فقط للسيرفر
+        const res = await fetch('https://backend-creovea.onrender.com/record-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                productId: productId,
+                orderId: data.orderID
+            })
+        });
 
-            if (!result.success || !result.downloadUrl) {
-                alert('Payment failed. Please try again.');
-                return;
-            }
+        const result = await res.json();
 
-            window.location.href = result.downloadUrl;
-        } catch (err) {
-            console.error(err);
-            alert('Payment failed. Please try again.');
+        if (!result.success || !result.downloadUrl) {
+            alert('Payment verification failed');
+            return;
         }
-    },
 
-    onError: err => {
-        console.error('PayPal error:', err);
+        // التحميل فقط بعد التأكد من الدفع
+        window.location.href = result.downloadUrl;
+
+    } catch (err) {
+        console.error(err);
         alert('Payment failed. Please try again.');
     }
+}
+
 }).render(`#paypal-button-${productId}`);
 
 
@@ -673,6 +676,7 @@
     </script>
 </body>
 </html>
+
 
 
 
