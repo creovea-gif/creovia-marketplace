@@ -562,30 +562,18 @@
 
                 // إنشاء زر PayPal ديناميكي لكل منتج
              
-               paypal.Buttons({
-    createOrder: function (data, actions) {
-        return actions.order.create({
-            purchase_units: [{
-                amount: {
-                    value: price,
-                    currency_code: 'USD'
-                }
-            }]
-        });
-    },
+              paypal.Buttons({
+    createOrder: (data, actions) => actions.order.create({
+        purchase_units: [{ amount: { value: price, currency_code: 'USD' } }]
+    }),
 
-    onApprove: async function (data, actions) {
+    onApprove: async (data, actions) => {
         try {
-            // السيرفر هو من يتحقق من الدفع (لا نفعل capture هنا)
             const res = await fetch('https://backend-creovea.onrender.com/record-payment', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    productId: productId,
-                    orderId: data.orderID
-                })
+                body: JSON.stringify({ productId, orderId: data.orderID })
             });
-
             const result = await res.json();
 
             if (!result.success || !result.downloadUrl) {
@@ -593,20 +581,19 @@
                 return;
             }
 
-            // التحميل بعد التأكد من الدفع
             window.location.href = result.downloadUrl;
-
         } catch (err) {
-            console.error('PayPal onApprove error:', err);
+            console.error(err);
             alert('Payment failed. Please try again.');
         }
     },
 
-    onError: function (err) {
+    onError: err => {
         console.error('PayPal error:', err);
         alert('Payment failed. Please try again.');
     }
 }).render(`#paypal-button-${productId}`);
+
 
                
     }); // إغلاق forEach
@@ -686,6 +673,7 @@
     </script>
 </body>
 </html>
+
 
 
 
