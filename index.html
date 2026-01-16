@@ -402,6 +402,23 @@
     margin-top: 0.5rem;
 }
 
+        .share-btn {
+    width: 100%;
+    margin-top: 0.6rem;
+    padding: 0.6rem 1rem;
+    border: none;
+    border-radius: 8px;
+    background: #6366f1;
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.share-btn:hover {
+    background: #4f46e5;
+}
+
         
     </style>
 </head>
@@ -577,10 +594,34 @@ card.innerHTML = `
         <div class="price">$${price}</div>
         <div class="seller-name" style="margin-top:0.5rem; font-size:0.9rem; color:#6b7280;">By: ${sellerName}</div>
         <div class="buy-btn-container" id="paypal-button-${productId}"></div>
+
+<!-- زر نسخ الرابط -->
+        <button class="share-btn" data-id="${productId}">
+            🔗 Copy Product Link
+        </button>
+
+        <div class="buy-btn-container" id="paypal-button-${productId}"></div>
+   
     </div>
 `;
 
                 container.appendChild(card);
+const shareBtn = card.querySelector('.share-btn');
+
+shareBtn.addEventListener('click', (e) => {
+    e.stopPropagation(); // يمنع فتح صفحة المنتج
+
+    const productId = shareBtn.dataset.id;
+    const productUrl = `${window.location.origin}/product.html?id=${productId}`;
+
+    navigator.clipboard.writeText(productUrl)
+        .then(() => {
+            alert('✅ Product link copied!');
+        })
+        .catch(() => {
+            alert('❌ Failed to copy link');
+        });
+});
 
                 // إنشاء زر PayPal ديناميكي لكل منتج
              
@@ -709,6 +750,7 @@ formData.append('sellerEmail', window.currentUser.email);
     </script>
 </body>
 </html>
+
 
 
 
