@@ -562,7 +562,7 @@
 
                 // إنشاء زر PayPal ديناميكي لكل منتج
              
-                paypal.Buttons({
+               paypal.Buttons({
     createOrder: function (data, actions) {
         return actions.order.create({
             purchase_units: [{
@@ -574,30 +574,32 @@
         });
     },
 
-    onApprove: function (data, actions) {
-        return actions.order.capture().then(async function () {
-
-            const res = await fetch(
-                'https://backend-creovea.onrender.com/record-payment',
-                {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        productId: productId,
-                        orderId: data.orderID
-                    })
-                }
-            );
+    onApprove: async function (data, actions) {
+        try {
+            // السيرفر هو من يتحقق من الدفع (لا نفعل capture هنا)
+            const res = await fetch('https://backend-creovea.onrender.com/record-payment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    productId: productId,
+                    orderId: data.orderID
+                })
+            });
 
             const result = await res.json();
 
-            if (!result.success) {
-                alert('Payment verification failed');
+            if (!result.success || !result.downloadUrl) {
+                alert('Payment failed. Please try again.');
                 return;
             }
 
+            // التحميل بعد التأكد من الدفع
             window.location.href = result.downloadUrl;
-        });
+
+        } catch (err) {
+            console.error('PayPal onApprove error:', err);
+            alert('Payment failed. Please try again.');
+        }
     },
 
     onError: function (err) {
@@ -605,6 +607,7 @@
         alert('Payment failed. Please try again.');
     }
 }).render(`#paypal-button-${productId}`);
+
                
     }); // إغلاق forEach
 } // إغلاق renderProducts
@@ -683,6 +686,7 @@
     </script>
 </body>
 </html>
+
 
 
 
