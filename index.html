@@ -32,10 +32,11 @@
             signOut
         } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 const db = getFirestore(app);
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
+        
         // مراقبة حالة تسجيل الدخول
         onAuthStateChanged(auth, (user) => {
     window.currentUser = user; // ✅ نحفظ المستخدم عالميًا
@@ -583,13 +584,15 @@ const db = getFirestore(app);
                 container.innerHTML = '<p style="text-align:center; grid-column:1/-1; color:#6b7280; font-size:1.25rem;">No products found</p>';
                 return;
             }
-            products.forEach(p => {
+            for (const p of products) {
+
                 const card = document.createElement('div');
                 card.className = 'product-card';
                 card.style.cursor = 'pointer';
 card.addEventListener('click', () => {
     window.location.href = `product.html?id=${p.id}`;
 });
+} // نهاية for
 
                 const productId = p.id;
                 const price = Number(p.price).toFixed(2);
@@ -740,6 +743,7 @@ formData.append('sellerEmail', window.currentUser.email);
     </script>
 </body>
 </html>
+
 
 
 
