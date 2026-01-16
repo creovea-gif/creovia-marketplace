@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,7 +8,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- PayPal JavaScript SDK (Sandbox للتجربة - غيّر إلى Live لاحقاً) -->
-    <script src="https://www.paypal.com/sdk/js?client-id=AR_2EtGAODL-SCx1a3EEQkZyeGapi-9qWuKZ4xNBO2vaAnSX0oy4SPI-0RwjSAULiOGa8iE9bNj3JQ7X&currency=USD"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=Ady-fs_MNNG5Ue22tNNapD9abvFULboMBDy5vAbpDYt8jCVNkqeyS1hssK58OTIWLWQt5xHxZlcZ_hSB&currency=USD&intent=capture"></script>
+
+
 
     <!-- Firebase SDK (modular) -->
     <script type="module">
@@ -389,6 +392,14 @@
             nav { flex-wrap: wrap; gap: 1rem; justify-content: center; }
             .search-and-filters { flex-direction: column; gap: 1.5rem; }
         }
+
+.seller-name {
+    font-size: 0.9rem;
+    color: #6b7280;
+    margin-top: 0.5rem;
+}
+
+        
     </style>
 </head>
 <body>
@@ -531,6 +542,8 @@
             }
         }
         function renderProducts(products) {
+            console.log('renderProducts called with:', products.length);
+
             const container = document.getElementById('productsContainer');
             container.innerHTML = '';
             if (products.length === 0) {
@@ -545,67 +558,63 @@
                 const name = p.name;
                 const salesCount = p.salesCount || 0;
 
-                card.innerHTML = `
-                    <img src="${p.previewImage || 'https://via.placeholder.com/300x225?text=Preview'}" alt="${name}">
-                    <div class="product-info">
-                        <h3>${name}</h3>
-                        <span class="type-badge">${p.type || 'Unknown'}</span>
-                        <div class="sales-count">Sales: ${salesCount}</div>
-                        <div class="price">$${price}</div>
-                        <div class="buy-btn-container" id="paypal-button-${productId}"></div>
-                    </div>
-                `;
+                const sellerName = p.seller || 'Unknown';
+
+card.innerHTML = `
+    <img src="${p.previewImage || 'https://via.placeholder.com/300x225?text=Preview'}" alt="${name}">
+    <div class="product-info">
+        <h3>${name}</h3>
+        <span class="type-badge">${p.type || 'Unknown'}</span>
+        <div class="sales-count">Sales: ${salesCount}</div>
+        <div class="price">$${price}</div>
+        <div class="seller-name" style="margin-top:0.5rem; font-size:0.9rem; color:#6b7280;">By: ${sellerName}</div>
+        <div class="buy-btn-container" id="paypal-button-${productId}"></div>
+    </div>
+`;
+
                 container.appendChild(card);
 
                 // إنشاء زر PayPal ديناميكي لكل منتج
-                paypal.Buttons({
-                    createOrder: function(data, actions) {
-                        return actions.order.create({
-                            purchase_units: [{
-                                amount: {
-                                    value: price,
-                                    currency_code: 'USD'
-                                },
-                                description: `Purchase of ${name}`
-                            }]
-                        });
-                    },
-                    onApprove: function(data, actions) {
-                        return actions.order.capture().then(function(details) {
-                            alert('Payment successful! Thank you, ' + details.payer.name.given_name);
-                            
-                            // تسجيل الدفع في الـ backend وزيادة المبيعات + الحصول على رابط تحميل
-                            fetch('https://backend-creovea.onrender.com/record-payment', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({
-                                    productId: productId,
-                                    orderId: data.orderID,
-                                    payerEmail: details.payer.email_address,
-                                    amount: price
-                                })
-                            })
-                            .then(res => res.json())
-                            .then(result => {
-                                if (result.downloadUrl) {
-                                    window.location.href = result.downloadUrl;
-                                } else {
-                                    alert('Payment recorded, download link will be sent soon.');
-                                }
-                            })
-                            .catch(err => {
-                                console.error(err);
-                                alert('Payment successful, but error getting download link.');
-                            });
-                        });
-                    },
-                    onError: function(err) {
-                        console.error('PayPal error:', err);
-                        alert('Payment failed. Please try again.');
-                    }
-                }).render(`#paypal-button-${productId}`);
-            });
-        }
+             
+              paypal.Buttons({
+    createOrder: function(data, actions) {
+        return actions.order.create({
+            purchase_units: [{
+                amount: { value: price },
+            }]
+        });
+    },
+    onApprove: function(data, actions) {
+        // ✅ هنا تأكد أن productId صحيح
+        console.log('Sending payment for productId:', productId); // هذا سيساعدك على تتبع
+
+        return fetch('https://backend-creovea.onrender.com/record-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                productId: productId, // يجب أن يكون نفس الـ ID الموجود في Firestore
+                orderId: data.orderID
+            })
+        })
+        .then(res => res.json())
+        .then(result => {
+            if (!result.success) alert('Payment verification failed');
+            else window.location.href = result.downloadUrl;
+        });
+    },
+    onError: function(err) {
+        console.error('PayPal error:', err);
+        alert('Payment failed. Please try again.');
+    }
+}).render(`#paypal-button-${productId}`);
+
+
+
+
+               
+    }); // إغلاق forEach
+} // إغلاق renderProducts
+
         function updateProductsDisplay() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
           
@@ -620,12 +629,20 @@
             }
             renderProducts(filteredProducts);
         }
-        function filterProducts(type) {
-            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            currentFilter = type;
-            updateProductsDisplay();
+       function filterProducts(type) {
+    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+
+    // تفعيل الزر الصحيح بدون event
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        if (btn.textContent.toLowerCase().includes(type) || type === 'all') {
+            btn.classList.add('active');
         }
+    });
+
+    currentFilter = type;
+    updateProductsDisplay();
+}
+
         document.getElementById('searchInput').addEventListener('input', updateProductsDisplay);
         document.getElementById('uploadForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -643,6 +660,8 @@
             formData.append('desc', document.getElementById('productDesc').value.trim());
             formData.append('type', document.getElementById('productType').value);
             formData.append('price', document.getElementById('productPrice').value);
+            formData.append('sellerEmail', auth.currentUser.email); // ← هذا السطر الجديد
+
             try {
                 const response = await fetch('https://backend-creovea.onrender.com/upload', {
                     method: 'POST',
@@ -672,3 +691,14 @@
     </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
