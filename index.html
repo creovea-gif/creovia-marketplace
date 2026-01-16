@@ -391,6 +391,24 @@
             nav { flex-wrap: wrap; gap: 1rem; justify-content: center; }
             .search-and-filters { flex-direction: column; gap: 1.5rem; }
         }
+
+.share-btn {
+    width: 100%;
+    padding: 0.6rem 1rem;
+    border: none;
+    border-radius: 8px;
+    background: #6366f1;
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 0.6rem;
+    transition: background 0.2s;
+}
+.share-btn:hover {
+    background: #4f46e5;
+}
+
+        
     </style>
 </head>
 <body>
@@ -557,6 +575,8 @@
                         <div class="sales-count">Sales: ${salesCount}</div>
                         <div class="price">$${price}</div>
                         <div class="buy-btn-container" id="paypal-button-${productId}"></div>
+                       <button class="share-btn" data-product-url="https://https://creovea-gif.github.io/creovia-marketplace/download/${productId}">Share / Copy Link</button>
+
                     </div>
                 `;
                 container.appendChild(card);
@@ -673,9 +693,26 @@
             }
         });
         loadProducts();
+
+        document.querySelectorAll('.share-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const url = btn.dataset.productUrl;
+        navigator.clipboard.writeText(url)
+            .then(() => {
+                alert('Product link copied to clipboard!');
+            })
+            .catch(err => {
+                console.error('Failed to copy:', err);
+                alert('Could not copy link.');
+            });
+    });
+});
+
+        
     </script>
 </body>
 </html>
+
 
 
 
