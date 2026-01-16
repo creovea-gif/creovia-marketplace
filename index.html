@@ -612,7 +612,8 @@ shareBtn.addEventListener('click', (e) => {
     e.stopPropagation(); // يمنع فتح صفحة المنتج
 
     const productId = shareBtn.dataset.id;
-    const productUrl = `${window.location.origin}/product.html?id=${productId}`;
+    const productUrl = `${window.location.origin}${window.location.pathname.replace(/\/[^/]*$/, '')}/product.html?id=${productId}`;
+
 
     navigator.clipboard.writeText(productUrl)
         .then(() => {
@@ -750,6 +751,7 @@ formData.append('sellerEmail', window.currentUser.email);
     </script>
 </body>
 </html>
+
 
 
 
