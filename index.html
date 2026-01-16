@@ -7,7 +7,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- PayPal JavaScript SDK (Sandbox للتجربة - غيّر إلى Live لاحقاً) -->
-    <script src="https://www.paypal.com/sdk/js?client-id=AR_2EtGAODL-SCx1a3EEQkZyeGapi-9qWuKZ4xNBO2vaAnSX0oy4SPI-0RwjSAULiOGa8iE9bNj3JQ7X&currency=USD&intent=capture"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=Ady-fs_MNNG5Ue22tNNapD9abvFULboMBDy5vAbpDYt8jCVNkqeyS1hssK58OTIWLWQt5xHxZlcZ_hSB&currency=USD&intent=capture"></script>
+
 
 
     <!-- Firebase SDK (modular) -->
@@ -563,39 +564,32 @@
                 // إنشاء زر PayPal ديناميكي لكل منتج
              
               paypal.Buttons({
-    createOrder: (data, actions) => actions.order.create({
-        purchase_units: [{ amount: { value: price, currency_code: 'USD' } }]
-    }),
-
-   onApprove: async function (data, actions) {
-    try {
-        // إرسال orderId فقط للسيرفر
-        const res = await fetch('https://backend-creovea.onrender.com/record-payment', {
+    createOrder: function(data, actions) {
+        return actions.order.create({
+            purchase_units: [{
+                amount: { value: price },
+            }]
+        });
+    },
+    onApprove: function(data, actions) {
+        // فقط إرسال orderId للسيرفر للتحقق
+        return fetch('https://backend-creovea.onrender.com/record-payment', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                productId: productId,
-                orderId: data.orderID
-            })
+            body: JSON.stringify({ productId, orderId: data.orderID })
+        })
+        .then(res => res.json())
+        .then(result => {
+            if (!result.success) alert('Payment verification failed');
+            else window.location.href = result.downloadUrl;
         });
-
-        const result = await res.json();
-
-        if (!result.success || !result.downloadUrl) {
-            alert('Payment verification failed');
-            return;
-        }
-
-        // التحميل فقط بعد التأكد من الدفع
-        window.location.href = result.downloadUrl;
-
-    } catch (err) {
-        console.error(err);
+    },
+    onError: function(err) {
+        console.error('PayPal error:', err);
         alert('Payment failed. Please try again.');
     }
-}
-
 }).render(`#paypal-button-${productId}`);
+
 
 
                
@@ -676,6 +670,7 @@
     </script>
 </body>
 </html>
+
 
 
 
