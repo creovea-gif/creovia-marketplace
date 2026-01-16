@@ -31,27 +31,11 @@
             onAuthStateChanged,
             signOut
         } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
         // مراقبة حالة تسجيل الدخول
         onAuthStateChanged(auth, (user) => {
     window.currentUser = user; // ✅ نحفظ المستخدم عالميًا
-
-            async function getUsernameByEmail(email) {
-    if (!email) return "Unknown";
-    try {
-        const docRef = doc(db, "users", email);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) return docSnap.data().username || email;
-        return email;
-    } catch {
-        return email;
-    }
-}
 
     const userEmailElement = document.getElementById("user-email");
     const logoutBtn = document.getElementById("logout-btn");
@@ -561,21 +545,6 @@ const db = getFirestore(app);
             }
         }
         function renderProducts(products) {
-           
-            
-            async function getUsernameByEmail(email) {
-    if (!email) return "Unknown";
-    try {
-        const docRef = doc(db, "users", email); // collection "users" و document id = email
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) return docSnap.data().username || email;
-        return email;
-    } catch (err) {
-        console.error("Error fetching username:", err);
-        return email;
-    }
-}
-
             console.log('renderProducts called with:', products.length);
 
             const container = document.getElementById('productsContainer');
@@ -584,23 +553,20 @@ const db = getFirestore(app);
                 container.innerHTML = '<p style="text-align:center; grid-column:1/-1; color:#6b7280; font-size:1.25rem;">No products found</p>';
                 return;
             }
-            for (const p of products) {
-
+            products.forEach(p => {
                 const card = document.createElement('div');
                 card.className = 'product-card';
                 card.style.cursor = 'pointer';
 card.addEventListener('click', () => {
     window.location.href = `product.html?id=${p.id}`;
 });
-} // نهاية for
 
                 const productId = p.id;
                 const price = Number(p.price).toFixed(2);
                 const name = p.name;
                 const salesCount = p.salesCount || 0;
 
-               const sellerName = await getUsernameByEmail(p.seller);
-
+                const sellerName = p.seller || 'Unknown';
 
 card.innerHTML = `
     <img src="${p.previewImage || 'https://via.placeholder.com/300x225?text=Preview'}" alt="${name}">
@@ -743,9 +709,6 @@ formData.append('sellerEmail', window.currentUser.email);
     </script>
 </body>
 </html>
-
-
-
 
 
 
