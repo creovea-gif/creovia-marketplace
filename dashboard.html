@@ -187,36 +187,127 @@
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-icon">📦</div>
-                <div class="stat-value">0</div>
+               <div class="stat-value" id="productsCount">0</div>
+
                 <div class="stat-label">Products Uploaded</div>
             </div>
 
             <div class="stat-card">
                 <div class="stat-icon">💰</div>
-                <div class="stat-value">$0</div>
+               <div class="stat-value" id="earnings">$0</div>
+
                 <div class="stat-label">Total Earnings</div>
             </div>
 
             <div class="stat-card">
                 <div class="stat-icon">⬇</div>
-                <div class="stat-value">0</div>
+                <div class="stat-value" id="downloads">0</div>
+
                 <div class="stat-label">Total Downloads</div>
             </div>
         </div>
 
         <div class="recent-products">
             <h3>Recent Products</h3>
-            <div class="product-item">
-                <div class="product-name">No products uploaded yet</div>
-                <div class="product-info">Upload your first digital product to start seeing it here</div>
-            </div>
+           <div id="productsList"></div>
+
             <!-- يمكن إضافة المزيد من المنتجات لاحقاً ديناميكياً -->
         </div>
+
+        <button 
+  onclick="requestPayout()" 
+  style="
+    margin-top:2rem;
+    padding:1rem 2.5rem;
+    border:none;
+    background:#10b981;
+    color:white;
+    border-radius:999px;
+    font-size:1.1rem;
+    cursor:pointer;">
+  Request Payout
+</button>
+
+    
     </main>
 
     <footer>
         © 2026 CREOVIA — All Rights Reserved
     </footer>
 
+    <script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+
+/* 🔴 نفس إعدادات Firebase الموجودة في index.html */
+const firebaseConfig = {
+  apiKey: "AIzaSyCh2Pf1c1Gb7fQCQy64WmNYvWBKffwiuOs",
+  authDomain: "creoveo-7da32.firebaseapp.com",
+  projectId: "creoveo-7da32",
+  storageBucket: "creoveo-7da32.firebasestorage.app",
+  messagingSenderId: "819015345734",
+  appId: "1:819015345734:web:b12e15fcaa6c3234b7cc47"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+/* 🔹 إذا لم يكن مسجل دخول → تحويل إلى login */
+onAuthStateChanged(auth, user => {
+  if (!user) {
+    window.location.href = "login.html";
+    return;
+  }
+  loadDashboard(user.email);
+});
+
+/* 🔹 جلب بيانات البائع */
+async function loadDashboard(email) {
+  const res = await fetch(
+    `https://backend-creovea.onrender.com/seller-dashboard?email=${email}`
+  );
+  const data = await res.json();
+
+  document.getElementById('productsCount').textContent = data.productsCount;
+  document.getElementById('earnings').textContent = `$${data.sellerEarnings.toFixed(2)}`;
+  document.getElementById('downloads').textContent = data.totalDownloads;
+
+  const list = document.getElementById('productsList');
+  list.innerHTML = '';
+
+  data.products.forEach(p => {
+    list.innerHTML += `
+      <div class="product-item">
+        <div class="product-name">${p.name}</div>
+        <div class="product-info">Sales: ${p.sales}</div>
+      </div>
+    `;
+  });
+
+  window.currentEmail = email;
+  window.currentEarnings = data.sellerEarnings;
+}
+
+/* 🔹 طلب الأرباح */
+async function requestPayout() {
+  if (window.currentEarnings <= 0) {
+    alert("No earnings yet");
+    return;
+  }
+
+  await fetch('https://backend-creovea.onrender.com/request-payout', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      sellerEmail: window.currentEmail,
+      amount: window.currentEarnings
+    })
+  });
+
+  alert("Payout request sent successfully");
+}
+</script>
+
+    
 </body>
 </html>
