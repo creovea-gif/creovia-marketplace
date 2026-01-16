@@ -556,6 +556,11 @@
             products.forEach(p => {
                 const card = document.createElement('div');
                 card.className = 'product-card';
+                card.style.cursor = 'pointer';
+card.addEventListener('click', () => {
+    window.location.href = `product.html?id=${p.id}`;
+});
+
                 const productId = p.id;
                 const price = Number(p.price).toFixed(2);
                 const name = p.name;
@@ -704,6 +709,7 @@ formData.append('sellerEmail', window.currentUser.email);
     </script>
 </body>
 </html>
+
 
 
 
