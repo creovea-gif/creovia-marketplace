@@ -651,7 +651,12 @@ shareBtn.addEventListener('click', (e) => {
         .then(res => res.json())
         .then(result => {
             if (!result.success) alert('Payment verification failed');
-            else window.location.href = result.downloadUrl;
+           else {
+    alert('✅ Payment successful!');
+    loadProducts(); // 🔥 هذا السطر المهم
+    window.location.href = result.downloadUrl;
+}
+
         });
     },
     onError: function(err) {
@@ -765,6 +770,7 @@ function goToDashboard() {
     </script>
 </body>
 </html>
+
 
 
 
