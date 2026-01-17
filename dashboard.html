@@ -290,13 +290,12 @@ async function loadDashboard(email) {
 
 /* 🔹 طلب الأرباح */
 window.requestPayout = async function () {
-
-  if (window.currentEarnings <= 0) {
-    alert("No earnings yet");
+  if (window.currentEarnings < 50) {
+    alert("❌ Minimum payout is $50");
     return;
   }
 
-  await fetch('https://backend-creovea.onrender.com/request-payout', {
+  const res = await fetch('https://backend-creovea.onrender.com/request-payout', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -305,8 +304,19 @@ window.requestPayout = async function () {
     })
   });
 
-  alert("Payout request sent successfully");
-}
+  const data = await res.json();
+
+  if (data.success) {
+    alert("✅ Payout request sent successfully");
+
+    // 🔥 تصفير الأرباح في الواجهة
+    window.currentEarnings = 0;
+    document.getElementById('earnings').textContent = "$0.00";
+  } else {
+    alert("❌ Failed to request payout");
+  }
+};
+
 </script>
 
     
