@@ -214,8 +214,7 @@
             <!-- يمكن إضافة المزيد من المنتجات لاحقاً ديناميكياً -->
         </div>
 
-        <button 
-  onclick="requestPayout()" 
+  <button id="requestPayoutBtn"
   style="
     margin-top:2rem;
     padding:1rem 2.5rem;
@@ -227,6 +226,8 @@
     cursor:pointer;">
   Request Payout
 </button>
+
+
 
     
     </main>
@@ -317,6 +318,12 @@
             alert('Failed to request payout');
         }
     }
+
+document.getElementById("requestPayoutBtn")
+  .addEventListener("click", requestPayout);
+
+
+     
 </script>
 
 
