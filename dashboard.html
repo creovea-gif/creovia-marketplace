@@ -235,65 +235,90 @@
         © 2026 CREOVIA — All Rights Reserved
     </footer>
 
-  <script type="module">
-  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+ <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
-  const auth = getAuth();
+    // Firebase config من مشروعك
+    const firebaseConfig = {
+        apiKey: "AIzaSyCh2Pf1c1Gb7fQCQy64WmNYvWBKffwiuOs",
+        authDomain: "creoveo-7da32.firebaseapp.com",
+        projectId: "creoveo-7da32",
+        storageBucket: "creoveo-7da32.firebasestorage.app",
+        messagingSenderId: "819015345734",
+        appId: "1:819015345734:web:b12e15fcaa6c3234b7cc47",
+        measurementId: "G-58G17GT7VF"
+    };
 
-  onAuthStateChanged(auth, async (user) => {
-    if (!user) {
-      window.location.href = "login.html";
-      return;
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    let currentUser = null;
+
+    // مراقبة تسجيل الدخول
+    onAuthStateChanged(auth, (user) => {
+        if (!user) {
+            window.location.href = "login.html";
+        } else {
+            currentUser = user;
+            loadDashboard();
+        }
+    });
+
+    async function loadDashboard() {
+        try {
+            const res = await fetch(`https://backend-creovea.onrender.com/seller-dashboard?email=${currentUser.email}`);
+            if (!res.ok) throw new Error('Failed to fetch dashboard data');
+            const data = await res.json();
+
+            // تحديث الإحصائيات
+            document.getElementById('productsCount').textContent = data.productsCount;
+            document.getElementById('downloads').textContent = data.totalDownloads;
+            document.getElementById('earnings').textContent = `$${data.sellerEarnings.toFixed(2)}`;
+
+            // عرض المنتجات الأخيرة
+            const productsList = document.getElementById('productsList');
+            productsList.innerHTML = '';
+            data.products.slice(0, 5).forEach(p => {
+                const div = document.createElement('div');
+                div.className = 'product-item';
+                div.innerHTML = `
+                    <div class="product-name">${p.name}</div>
+                    <div class="product-info">Sales: ${p.sales}</div>
+                `;
+                productsList.appendChild(div);
+            });
+
+        } catch (error) {
+            console.error('Dashboard load error:', error);
+            alert('Failed to load dashboard data. Please try again.');
+        }
     }
 
-    try {
-      const res = await fetch(`https://backend-creovea.onrender.com/seller-dashboard?email=${user.email}`);
-      if (!res.ok) throw new Error('Failed to fetch dashboard');
-      const data = await res.json();
+    // دالة طلب السحب
+    async function requestPayout() {
+        if (!currentUser) return alert('You must be logged in');
+        const amount = parseFloat(prompt("Enter payout amount (minimum $50):"));
+        if (isNaN(amount) || amount < 50) return alert('Amount must be $50 or more');
 
-      document.getElementById('productsCount').textContent = data.productsCount;
-      document.getElementById('downloads').textContent = data.totalDownloads;
-      document.getElementById('earnings').textContent = `$${data.sellerEarnings.toFixed(2)}`;
+        try {
+            const res = await fetch('https://backend-creovea.onrender.com/request-payout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sellerEmail: currentUser.email, amount })
+            });
+            const result = await res.json();
+            if (!res.ok) return alert(result.message || 'Payout request failed');
 
-      const productsList = document.getElementById('productsList');
-      productsList.innerHTML = '';
-      data.products.forEach(p => {
-        const div = document.createElement('div');
-        div.className = 'product-item';
-        div.innerHTML = `
-          <div class="product-name">${p.name}</div>
-          <div class="product-info">Sales: ${p.sales}</div>
-        `;
-        productsList.appendChild(div);
-      });
-
-    } catch (error) {
-      console.error(error);
-      alert('Could not load dashboard data.');
+            alert('Payout requested successfully!');
+            loadDashboard(); // إعادة تحميل البيانات لتحديث الأرباح
+        } catch (error) {
+            console.error('Request payout error:', error);
+            alert('Failed to request payout');
+        }
     }
-  });
-
-  window.requestPayout = async function() {
-    const authUser = auth.currentUser;
-    if (!authUser) return alert('You must be logged in');
-    const amount = parseFloat(prompt('Enter payout amount (min $50)'));
-    if (isNaN(amount) || amount < 50) return alert('Invalid amount');
-
-    try {
-      const res = await fetch('https://backend-creovea.onrender.com/request-payout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sellerEmail: authUser.email, amount })
-      });
-      const result = await res.json();
-      if (res.ok) alert('Payout request submitted!');
-      else alert(result.message || 'Request failed');
-    } catch (err) {
-      console.error(err);
-      alert('Request failed');
-    }
-  }
 </script>
+
 
 
     
