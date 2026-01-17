@@ -313,10 +313,29 @@ onAuthStateChanged(auth, async (user) => {
   if (availableEarnings < 0) availableEarnings = 0;
 
   /* 4️⃣ عرض القيم */
-  document.querySelectorAll('.stat-value')[0].textContent = productsSnap.size;
-  document.querySelectorAll('.stat-value')[1].textContent = "$" + availableEarnings.toFixed(2);
-  document.querySelectorAll('.stat-value')[2].textContent = totalDownloads;
+  document.getElementById('productsCount').textContent = productsSnap.size;
+document.getElementById('earnings').textContent = "$" + availableEarnings.toFixed(2);
+document.getElementById('downloads').textContent = totalDownloads;
+
+    const productsList = document.getElementById('productsList');
+productsList.innerHTML = ''; // مسح أي محتوى سابق
+
+productsSnap.forEach(doc => {
+    const p = doc.data();
+    const div = document.createElement('div');
+    div.className = 'product-item';
+    div.innerHTML = `
+        <div class="product-name">${p.name}</div>
+        <div class="product-info">
+            Sales: ${p.sales || 0}, 
+            Downloads: ${p.downloads || 0}, 
+            Price: $${p.price || 0}
+        </div>
+    `;
+    productsList.appendChild(div);
 });
+
+
 
 
 
