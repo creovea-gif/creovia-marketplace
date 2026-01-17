@@ -289,7 +289,8 @@ async function loadDashboard(email) {
 }
 
 /* 🔹 طلب الأرباح */
-async function requestPayout() {
+window.requestPayout = async function () {
+
   if (window.currentEarnings <= 0) {
     alert("No earnings yet");
     return;
