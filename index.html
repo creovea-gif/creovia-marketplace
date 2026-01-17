@@ -584,7 +584,8 @@ card.addEventListener('click', () => {
                 const name = p.name;
                 const salesCount = p.salesCount || 0;
 
-                const sellerName = p.seller || 'Unknown';
+                const sellerName = p.sellerEmail || 'Unknown';
+
 
 card.innerHTML = `
     <img src="${p.previewImage || 'https://via.placeholder.com/300x225?text=Preview'}" alt="${name}">
@@ -764,6 +765,7 @@ function goToDashboard() {
     </script>
 </body>
 </html>
+
 
 
 
