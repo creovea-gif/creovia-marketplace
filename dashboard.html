@@ -309,13 +309,14 @@ window.requestPayout = async function () {
   if (data.success) {
     alert("✅ Payout request sent successfully");
 
-    // 🔥 تصفير الأرباح في الواجهة
+    // 🔥 تصفير الأرباح المعروضة فقط
     window.currentEarnings = 0;
     document.getElementById('earnings').textContent = "$0.00";
   } else {
-    alert("❌ Failed to request payout");
+    alert(data.message || "❌ Failed to request payout");
   }
 };
+
 
 </script>
 
