@@ -235,111 +235,66 @@
         © 2026 CREOVIA — All Rights Reserved
     </footer>
 
-    <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import {
-  getFirestore,
-  collection,
-  getDocs,
-  query,
-  where
-} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
-import {
-  getAuth,
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+  <script type="module">
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
-/* 🔴 ضع إعدادات Firebase الخاصة بك هنا */
-const firebaseConfig = {
-  apiKey: "AIzaSyCh2Pf1c1Gb7fQCQy64WmNYvWBKffwiuOs",
-  authDomain: "creoveo-7da32.firebaseapp.com",
-  projectId: "creoveo-7da32",
-  storageBucket: "creoveo-7da32.firebasestorage.app",
-  messagingSenderId: "819015345734",
-  appId: "1:819015345734:web:b12e15fcaa6c3234b7cc47",
-  measurementId: "G-58G17GT7VF"
-};
+  const auth = getAuth();
 
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      window.location.href = "login.html";
+      return;
+    }
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
+    try {
+      const res = await fetch(`https://backend-creovea.onrender.com/seller-dashboard?email=${user.email}`);
+      if (!res.ok) throw new Error('Failed to fetch dashboard');
+      const data = await res.json();
 
-/* ===============================
-   تحميل بيانات Dashboard
-================================ */
-onAuthStateChanged(auth, async (user) => {
-  if (!user) {
-    window.location.href = "login.html";
-    return;
+      document.getElementById('productsCount').textContent = data.productsCount;
+      document.getElementById('downloads').textContent = data.totalDownloads;
+      document.getElementById('earnings').textContent = `$${data.sellerEarnings.toFixed(2)}`;
+
+      const productsList = document.getElementById('productsList');
+      productsList.innerHTML = '';
+      data.products.forEach(p => {
+        const div = document.createElement('div');
+        div.className = 'product-item';
+        div.innerHTML = `
+          <div class="product-name">${p.name}</div>
+          <div class="product-info">Sales: ${p.sales}</div>
+        `;
+        productsList.appendChild(div);
+      });
+
+    } catch (error) {
+      console.error(error);
+      alert('Could not load dashboard data.');
+    }
+  });
+
+  window.requestPayout = async function() {
+    const authUser = auth.currentUser;
+    if (!authUser) return alert('You must be logged in');
+    const amount = parseFloat(prompt('Enter payout amount (min $50)'));
+    if (isNaN(amount) || amount < 50) return alert('Invalid amount');
+
+    try {
+      const res = await fetch('https://backend-creovea.onrender.com/request-payout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sellerEmail: authUser.email, amount })
+      });
+      const result = await res.json();
+      if (res.ok) alert('Payout request submitted!');
+      else alert(result.message || 'Request failed');
+    } catch (err) {
+      console.error(err);
+      alert('Request failed');
+    }
   }
-
-  const sellerEmail = user.email;
-
-  /* 1️⃣ اجلب منتجات البائع */
-  const productsSnap = await getDocs(
-    query(
-      collection(db, "products"),
-      where("sellerEmail", "==", sellerEmail)
-    )
-  );
-
-  let totalSales = 0;
-  let totalDownloads = 0;
-
-  productsSnap.forEach(doc => {
-    const p = doc.data();
-    totalSales += Number(p.sales || 0);
-    totalDownloads += Number(p.downloads || 0);
-  });
-
-  /* 2️⃣ اجلب طلبات السحب */
-  const payoutsSnap = await getDocs(
-    query(
-      collection(db, "payout_requests"),
-      where("sellerEmail", "==", sellerEmail)
-    )
-  );
-
-  let totalPayouts = 0;
-
-  payoutsSnap.forEach(doc => {
-    totalPayouts += Number(doc.data().amount || 0);
-  });
-
-  /* 3️⃣ الحساب الصحيح */
-  const grossEarnings = totalSales * 0.7;
-  let availableEarnings = grossEarnings - totalPayouts;
-  if (availableEarnings < 0) availableEarnings = 0;
-
-  /* 4️⃣ عرض القيم */
-  document.getElementById('productsCount').textContent = productsSnap.size;
-document.getElementById('earnings').textContent = "$" + availableEarnings.toFixed(2);
-document.getElementById('downloads').textContent = totalDownloads;
-
-    const productsList = document.getElementById('productsList');
-productsList.innerHTML = ''; // مسح أي محتوى سابق
-
-productsSnap.forEach(doc => {
-    const p = doc.data();
-    const div = document.createElement('div');
-    div.className = 'product-item';
-    div.innerHTML = `
-        <div class="product-name">${p.name}</div>
-        <div class="product-info">
-            Sales: ${p.sales || 0}, 
-            Downloads: ${p.downloads || 0}, 
-            Price: $${p.price || 0}
-        </div>
-    `;
-    productsList.appendChild(div);
-});
-
-
-
-
-
 </script>
+
 
     
 </body>
