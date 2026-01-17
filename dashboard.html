@@ -236,86 +236,83 @@
     </footer>
 
     <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  query,
+  where
+} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import {
+  getAuth,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
-/* 🔴 نفس إعدادات Firebase الموجودة في index.html */
+/* 🔴 ضع إعدادات Firebase الخاصة بك هنا */
 const firebaseConfig = {
-  apiKey: "AIzaSyCh2Pf1c1Gb7fQCQy64WmNYvWBKffwiuOs",
-  authDomain: "creoveo-7da32.firebaseapp.com",
-  projectId: "creoveo-7da32",
-  storageBucket: "creoveo-7da32.firebasestorage.app",
-  messagingSenderId: "819015345734",
-  appId: "1:819015345734:web:b12e15fcaa6c3234b7cc47"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID"
 };
 
 const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 const auth = getAuth(app);
 
-/* 🔹 إذا لم يكن مسجل دخول → تحويل إلى login */
-onAuthStateChanged(auth, user => {
+/* ===============================
+   تحميل بيانات Dashboard
+================================ */
+onAuthStateChanged(auth, async (user) => {
   if (!user) {
     window.location.href = "login.html";
     return;
   }
-  loadDashboard(user.email);
+
+  const sellerEmail = user.email;
+
+  /* 1️⃣ اجلب منتجات البائع */
+  const productsSnap = await getDocs(
+    query(
+      collection(db, "products"),
+      where("sellerEmail", "==", sellerEmail)
+    )
+  );
+
+  let totalSales = 0;
+  let totalDownloads = 0;
+
+  productsSnap.forEach(doc => {
+    const p = doc.data();
+    totalSales += Number(p.sales || 0);
+    totalDownloads += Number(p.downloads || 0);
+  });
+
+  /* 2️⃣ اجلب طلبات السحب */
+  const payoutsSnap = await getDocs(
+    query(
+      collection(db, "payout_requests"),
+      where("sellerEmail", "==", sellerEmail)
+    )
+  );
+
+  let totalPayouts = 0;
+
+  payoutsSnap.forEach(doc => {
+    totalPayouts += Number(doc.data().amount || 0);
+  });
+
+  /* 3️⃣ الحساب الصحيح */
+  const grossEarnings = totalSales * 0.7;
+  let availableEarnings = grossEarnings - totalPayouts;
+  if (availableEarnings < 0) availableEarnings = 0;
+
+  /* 4️⃣ عرض القيم */
+  document.querySelectorAll('.stat-value')[0].textContent = productsSnap.size;
+  document.querySelectorAll('.stat-value')[1].textContent = "$" + availableEarnings.toFixed(2);
+  document.querySelectorAll('.stat-value')[2].textContent = totalDownloads;
 });
 
-/* 🔹 جلب بيانات البائع */
-async function loadDashboard(email) {
-  const res = await fetch(
-    `https://backend-creovea.onrender.com/seller-dashboard?email=${email}`
-  );
-  const data = await res.json();
-
-  document.getElementById('productsCount').textContent = data.productsCount;
-  document.getElementById('earnings').textContent = `$${data.sellerEarnings.toFixed(2)}`;
-  document.getElementById('downloads').textContent = data.totalDownloads;
-
-  const list = document.getElementById('productsList');
-  list.innerHTML = '';
-
-  data.products.forEach(p => {
-    list.innerHTML += `
-      <div class="product-item">
-        <div class="product-name">${p.name}</div>
-        <div class="product-info">Sales: ${p.sales}</div>
-      </div>
-    `;
-  });
-
-  window.currentEmail = email;
-  window.currentEarnings = data.sellerEarnings;
-}
-
-/* 🔹 طلب الأرباح */
-window.requestPayout = async function () {
-  if (window.currentEarnings < 50) {
-    alert("❌ Minimum payout is $50");
-    return;
-  }
-
-  const res = await fetch('https://backend-creovea.onrender.com/request-payout', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      sellerEmail: window.currentEmail,
-      amount: window.currentEarnings
-    })
-  });
-
-  const data = await res.json();
-
-  if (data.success) {
-    alert("✅ Payout request sent successfully");
-
-    // 🔥 تصفير الأرباح المعروضة فقط
-    window.currentEarnings = 0;
-    document.getElementById('earnings').textContent = "$0.00";
-  } else {
-    alert(data.message || "❌ Failed to request payout");
-  }
-};
 
 
 </script>
