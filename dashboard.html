@@ -297,37 +297,52 @@
     }
 
     // دالة طلب السحب
-    async function requestPayout() {
-        if (!currentUser) return alert('You must be logged in');
-        const amount = parseFloat(prompt("Enter payout amount (minimum $50):"));
-        if (isNaN(amount) || amount < 50) return alert('Amount must be $50 or more');
+   async function requestPayout() {
+  if (!currentUser) {
+    alert('You must be logged in');
+    return;
+  }
 
-        try {
-            const res = await fetch('https://backend-creovea.onrender.com/request-payout', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-               const token = await currentUser.getIdToken();
+  const amount = parseFloat(
+    prompt("Enter payout amount (minimum $50):")
+  );
 
-await fetch('https://backend-creovea.onrender.com/request-payout', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`
-  },
-  body: JSON.stringify({ amount })
-});
+  if (isNaN(amount) || amount < 50) {
+    alert('Amount must be $50 or more');
+    return;
+  }
 
-            });
-            const result = await res.json();
-            if (!res.ok) return alert(result.message || 'Payout request failed');
+  try {
+    const token = await currentUser.getIdToken();
 
-            alert('Payout requested successfully!');
-            loadDashboard(); // إعادة تحميل البيانات لتحديث الأرباح
-        } catch (error) {
-            console.error('Request payout error:', error);
-            alert('Failed to request payout');
-        }
+    const res = await fetch(
+      'https://backend-creovea.onrender.com/request-payout',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ amount })
+      }
+    );
+
+    const result = await res.json();
+
+    if (!res.ok) {
+      alert(result.message || 'Payout request failed');
+      return;
     }
+
+    alert('Payout requested successfully!');
+    loadDashboard();
+
+  } catch (error) {
+    console.error('Request payout error:', error);
+    alert('Failed to request payout');
+  }
+}
+
 
 document.getElementById("requestPayoutBtn")
   .addEventListener("click", requestPayout);
