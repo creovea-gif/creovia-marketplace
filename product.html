@@ -87,11 +87,42 @@ textarea{
   border-radius:12px;
   cursor:pointer;
 }
+  .site-header{
+  max-width:900px;
+  margin:0 auto 20px;
+  display:flex;
+  align-items:center;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  text-decoration:none;
+  color:#111827;
+  font-weight:700;
+  font-size:22px;
+}
+
+.brand-logo{
+  width:38px;
+  height:38px;
+  object-fit:contain;
+}
+
 </style>
 </head>
 
 <body>
 
+<header class="site-header">
+  <a href="index.html" class="brand">
+    <img src="assets/logo.png" alt="CREOVIA Logo" class="brand-logo">
+    <span>CREOVIA</span>
+  </a>
+</header>
+
+  
 <div class="card">
   <h1 id="name">Loading...</h1>
   <div class="seller">By: <span id="sellerEmail">Loading...</span></div>
