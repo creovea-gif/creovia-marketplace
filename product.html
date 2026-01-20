@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Product | CREOVIA</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <!-- PayPal SDK -->
@@ -12,14 +11,14 @@
 
 <style>
 body{
-  font-family:'Inter',sans-serif;
+  font-family: 'Inter', sans-serif;
   background:#f9fafb;
   padding:20px;
 }
 .card{
   max-width:900px;
   margin:auto;
-  background:#fff;
+  background:white;
   border-radius:18px;
   padding:25px;
   box-shadow:0 15px 40px rgba(0,0,0,.08);
@@ -30,14 +29,25 @@ img{
   object-fit:contain;
   background:#f3f4f6;
   border-radius:14px;
+  margin-bottom:15px;
+}
+h1{
+  margin-bottom:5px;
 }
 .price{
   font-size:26px;
   font-weight:700;
   color:#059669;
 }
-.seller{color:#6b7280;margin-bottom:10px}
-.stats{display:flex;gap:15px;margin:15px 0}
+.seller{
+  color:#6b7280;
+  margin-bottom:10px;
+}
+.stats{
+  display:flex;
+  gap:15px;
+  margin:15px 0;
+}
 .stat{
   background:#f1f5f9;
   padding:8px 14px;
@@ -84,9 +94,9 @@ textarea{
 
 <div class="card">
   <h1 id="name">Loading...</h1>
-  <div class="seller">By: <span id="sellerEmail">...</span></div>
+  <div class="seller">By: <span id="sellerEmail">Loading...</span></div>
 
-  <img id="image">
+  <img id="image" src="" alt="Product Preview">
   <p id="desc"></p>
   <div class="price" id="price">$0.00</div>
 
@@ -102,100 +112,97 @@ textarea{
   <h2>Reviews</h2>
   <div id="reviewsList"></div>
 
-  <h3>Your Opinion</h3>
+  <h3>Your Review</h3>
   <div class="review-actions">
     <button class="like" id="likeBtn">👍 Like</button>
     <button class="dislike" id="dislikeBtn">👎 Dislike</button>
   </div>
 
-  <textarea id="reviewComment" placeholder="Optional comment..."></textarea>
-  <button class="submit-review" id="submitReview">Save Comment</button>
+  <textarea id="reviewComment" placeholder="Write your comment..."></textarea>
+  <button class="submit-review" id="submitReview">Submit Review</button>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import {
-  getFirestore, doc, setDoc, getDocs, query, where,
-  collection, serverTimestamp
+  getFirestore, doc, setDoc, getDocs, query, where, collection, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
+// Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyCh2Pf1c1Gb7fQCQy64WmNYvWBKffwiuOs",
   authDomain: "creoveo-7da32.firebaseapp.com",
   projectId: "creoveo-7da32"
 };
-
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-const productId = new URLSearchParams(location.search).get("id");
-if(!productId) alert("Product not found");
+const params = new URLSearchParams(window.location.search);
+const productId = params.get('id');
 
-let currentUser=null;
-let currentLike=null;
+if(!productId){ alert("Product not found"); }
 
-onAuthStateChanged(auth,u=>currentUser=u);
+let currentUser = null;
+let selectedLike = null;
+
+onAuthStateChanged(auth, user => currentUser = user);
 
 // ---------- LOAD PRODUCT ----------
 async function loadProduct(){
-  const res = await fetch("https://backend-creovea.onrender.com/products");
-  const products = await res.json();
-  const product = products.find(p=>p.id==productId);
-  if(!product) return alert("Product not found");
+  try{
+    const res = await fetch('https://backend-creovea.onrender.com/products');
+    const products = await res.json();
+    const product = products.find(p=>p.id==productId);
+    if(!product) return alert("Product not found");
 
-  name.textContent=product.name;
-  desc.textContent=product.description;
-  price.textContent="$"+product.price;
-  image.src=product.previewImage;
-  sellerEmail.textContent=product.sellerEmail || "Unknown";
+    document.getElementById('name').textContent = product.name;
+    document.getElementById('desc').textContent = product.description;
+    document.getElementById('price').textContent = '$'+Number(product.price).toFixed(2);
+    document.getElementById('image').src = product.previewImage;
+    document.getElementById('sellerEmail').textContent = product.sellerEmail || "Unknown";
 
-  paypal.Buttons({
-    createOrder:(d,a)=>a.order.create({
-      purchase_units:[{amount:{value:product.price}}]
-    }),
-    onApprove:async d=>{
-      const r=await fetch("https://backend-creovea.onrender.com/record-payment",{
-        method:"POST",
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({productId,orderId:d.orderID})
-      }).then(r=>r.json());
-      if(r.success) location.href=r.downloadUrl;
-      else alert("Payment failed");
-    }
-  }).render("#paypal-button-container");
+    // ---------- PAYPAL ----------
+    paypal.Buttons({
+      createOrder: (d,a)=>a.order.create({
+        purchase_units:[{amount:{value:product.price}}]
+      }),
+      onApprove: async (d)=>{
+        const res = await fetch("https://backend-creovea.onrender.com/record-payment",{
+          method:"POST",
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({productId,orderId:d.orderID})
+        });
+        const r = await res.json();
+        if(r.success) window.location.href=r.downloadUrl;
+        else alert("Payment failed");
+      }
+    }).render("#paypal-button-container");
 
-  loadReviews();
+    loadReviews();
+
+  }catch(err){
+    console.error(err);
+    alert("Failed to load product");
+  }
 }
 
 // ---------- REVIEWS ----------
-async function saveReview(like,comment=""){
-  if(!currentUser) return alert("Login required");
-  const id=`${productId}_${currentUser.uid}`;
-  await setDoc(doc(db,"reviews",id),{
-    productId,
-    userId:currentUser.uid,
-    userEmail:currentUser.email,
-    like,
-    comment,
-    createdAt:serverTimestamp()
-  });
-  loadReviews();
-}
+const likeBtn = document.getElementById("likeBtn");
+const dislikeBtn = document.getElementById("dislikeBtn");
+const submitReview = document.getElementById("submitReview");
+const reviewComment = document.getElementById("reviewComment");
+const reviewsList = document.getElementById("reviewsList");
+const likesCount = document.getElementById("likesCount");
+const dislikesCount = document.getElementById("dislikesCount");
 
-likeBtn.onclick=()=>{ currentLike=true; saveReview(true); };
-dislikeBtn.onclick=()=>{ currentLike=false; saveReview(false); };
-
-submitReview.onclick=()=>{
-  if(currentLike===null) return alert("Choose like or dislike first");
-  saveReview(currentLike,reviewComment.value.trim());
-  reviewComment.value="";
-};
+likeBtn.onclick = ()=>selectedLike=true;
+dislikeBtn.onclick = ()=>selectedLike=false;
 
 async function loadReviews(){
-  const q=query(collection(db,"reviews"),where("productId","==",productId));
-  const snap=await getDocs(q);
+  const q = query(collection(db,"reviews"),where("productId","==",productId));
+  const snap = await getDocs(q);
   let likes=0,dislikes=0;
   reviewsList.innerHTML="";
   snap.forEach(d=>{
@@ -203,16 +210,33 @@ async function loadReviews(){
     r.like?likes++:dislikes++;
     reviewsList.innerHTML+=`
       <div class="review">
-        ${r.like?"👍":"👎"} <b>${r.userEmail}</b><br>
-        ${r.comment||""}
+        ${r.like?'👍':'👎'} <strong>${r.userEmail}</strong><br>
+        ${r.comment}
       </div>`;
   });
   likesCount.textContent=likes;
   dislikesCount.textContent=dislikes;
 }
 
+submitReview.onclick = async ()=>{
+  if(!currentUser) return alert("Login required");
+  if(selectedLike===null) return alert("Choose like or dislike");
+
+  const reviewId = `${productId}_${currentUser.uid}`;
+  await setDoc(doc(db,"reviews",reviewId),{
+    productId,
+    userId:currentUser.uid,
+    userEmail:currentUser.email,
+    like:selectedLike,
+    comment:reviewComment.value.trim(),
+    createdAt:serverTimestamp()
+  });
+
+  reviewComment.value="";
+  loadReviews();
+};
+
 loadProduct();
 </script>
-
 </body>
 </html>
