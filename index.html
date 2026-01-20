@@ -33,18 +33,6 @@
         } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-      
-        import {
-  getFirestore,
-  doc,
-  setDoc,
-  collection,
-  getDocs
-} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-
-const db = getFirestore(app);
-
-        
         // مراقبة حالة تسجيل الدخول
         onAuthStateChanged(auth, (user) => {
     window.currentUser = user; // ✅ نحفظ المستخدم عالميًا
@@ -607,21 +595,6 @@ card.innerHTML = `
         <div class="sales-count">Sales: ${salesCount}</div>
         <div class="price">$${price}</div>
         <div class="seller-name" style="margin-top:0.5rem; font-size:0.9rem; color:#6b7280;">By: ${sellerName}</div>
-
-<div class="rating-box" style="margin-top:0.8rem;">
-  <textarea 
-    placeholder="Leave a comment (optional)"
-    class="rating-comment"
-    style="width:100%; padding:0.4rem; font-size:0.85rem;"
-  ></textarea>
-
-  <div style="margin-top:0.4rem;">
-    <button class="like-btn">👍</button>
-    <button class="dislike-btn">👎</button>
-  </div>
-
-
-        
         <div class="buy-btn-container" id="paypal-button-${productId}"></div>
 
 <!-- زر نسخ الرابط -->
@@ -635,54 +608,6 @@ card.innerHTML = `
 `;
 
                 container.appendChild(card);
-
-const likeBtn = card.querySelector('.like-btn');
-const dislikeBtn = card.querySelector('.dislike-btn');
-const commentInput = card.querySelector('.rating-comment');
-
-async function submitRating(isLike) {
-  if (!window.currentUser) {
-    alert('You must be logged in to rate.');
-    return;
-  }
-
-  try {
-    const ratingRef = doc(
-      db,
-      'products',
-      productId,
-      'ratings',
-      window.currentUser.uid
-    );
-
-    await setDoc(ratingRef, {
-      userId: window.currentUser.uid,
-      like: isLike,
-      comment: commentInput.value || '',
-      createdAt: Date.now()
-    });
-
-    alert('✅ Rating submitted');
-    likeBtn.disabled = true;
-    dislikeBtn.disabled = true;
-
-  } catch (err) {
-    alert('❌ You already rated this product');
-    console.error(err);
-  }
-}
-
-likeBtn.addEventListener('click', e => {
-  e.stopPropagation();
-  submitRating(true);
-});
-
-dislikeBtn.addEventListener('click', e => {
-  e.stopPropagation();
-  submitRating(false);
-});
-
-                
 const shareBtn = card.querySelector('.share-btn');
 
 shareBtn.addEventListener('click', (e) => {
@@ -845,9 +770,6 @@ function goToDashboard() {
     </script>
 </body>
 </html>
-
-
-
 
 
 
