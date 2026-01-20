@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Product | CREOVIA</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <!-- PayPal SDK -->
@@ -11,7 +12,7 @@
 
 <style>
 body{
-  font-family: 'Inter', sans-serif;
+  font-family:'Inter',sans-serif;
   background:#f9fafb;
   padding:20px;
 }
@@ -31,9 +32,7 @@ img{
   border-radius:14px;
   margin-bottom:15px;
 }
-h1{
-  margin-bottom:5px;
-}
+h1{margin-bottom:5px}
 .price{
   font-size:26px;
   font-weight:700;
@@ -96,7 +95,7 @@ textarea{
   <h1 id="name">Loading...</h1>
   <div class="seller">By: <span id="sellerEmail">Loading...</span></div>
 
-  <img id="image" src="" alt="Product Preview">
+  <img id="image" src="">
   <p id="desc"></p>
   <div class="price" id="price">$0.00</div>
 
@@ -118,8 +117,8 @@ textarea{
     <button class="dislike" id="dislikeBtn">👎 Dislike</button>
   </div>
 
-  <textarea id="reviewComment" placeholder="Write your comment..."></textarea>
-  <button class="submit-review" id="submitReview">Submit Review</button>
+  <textarea id="reviewComment" placeholder="Write your comment (optional)..."></textarea>
+  <button class="submit-review" id="submitReview">Submit Comment</button>
 </div>
 
 <script type="module">
@@ -129,76 +128,96 @@ import {
   getFirestore, doc, setDoc, getDocs, query, where, collection, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
-// Firebase Config
+/* Firebase */
 const firebaseConfig = {
   apiKey: "AIzaSyCh2Pf1c1Gb7fQCQy64WmNYvWBKffwiuOs",
   authDomain: "creoveo-7da32.firebaseapp.com",
   projectId: "creoveo-7da32"
 };
+
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+/* Globals */
 const params = new URLSearchParams(window.location.search);
-const productId = params.get('id');
-
-if(!productId){ alert("Product not found"); }
+const productId = params.get("id");
 
 let currentUser = null;
 let selectedLike = null;
 
-onAuthStateChanged(auth, user => currentUser = user);
+onAuthStateChanged(auth,user=>currentUser=user);
 
-// ---------- LOAD PRODUCT ----------
+/* ---------- PRODUCT ---------- */
 async function loadProduct(){
-  try{
-    const res = await fetch('https://backend-creovea.onrender.com/products');
-    const products = await res.json();
-    const product = products.find(p=>p.id==productId);
-    if(!product) return alert("Product not found");
+  const res = await fetch("https://backend-creovea.onrender.com/products");
+  const products = await res.json();
+  const product = products.find(p=>p.id==productId);
+  if(!product) return alert("Product not found");
 
-    document.getElementById('name').textContent = product.name;
-    document.getElementById('desc').textContent = product.description;
-    document.getElementById('price').textContent = '$'+Number(product.price).toFixed(2);
-    document.getElementById('image').src = product.previewImage;
-    document.getElementById('sellerEmail').textContent = product.sellerEmail || "Unknown";
+  name.textContent = product.name;
+  desc.textContent = product.description;
+  price.textContent = "$"+Number(product.price).toFixed(2);
+  image.src = product.previewImage;
+  sellerEmail.textContent = product.sellerEmail || "Unknown";
 
-    // ---------- PAYPAL ----------
-    paypal.Buttons({
-      createOrder: (d,a)=>a.order.create({
-        purchase_units:[{amount:{value:product.price}}]
-      }),
-      onApprove: async (d)=>{
-        const res = await fetch("https://backend-creovea.onrender.com/record-payment",{
-          method:"POST",
-          headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({productId,orderId:d.orderID})
-        });
-        const r = await res.json();
-        if(r.success) window.location.href=r.downloadUrl;
-        else alert("Payment failed");
-      }
-    }).render("#paypal-button-container");
+  paypal.Buttons({
+    createOrder:(d,a)=>a.order.create({
+      purchase_units:[{amount:{value:product.price}}]
+    }),
+    onApprove:async(d)=>{
+      const r = await fetch("https://backend-creovea.onrender.com/record-payment",{
+        method:"POST",
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({productId,orderId:d.orderID})
+      }).then(r=>r.json());
+      if(r.success) location.href=r.downloadUrl;
+      else alert("Payment failed");
+    }
+  }).render("#paypal-button-container");
 
-    loadReviews();
-
-  }catch(err){
-    console.error(err);
-    alert("Failed to load product");
-  }
+  loadReviews();
 }
 
-// ---------- REVIEWS ----------
+/* ---------- REVIEWS ---------- */
 const likeBtn = document.getElementById("likeBtn");
 const dislikeBtn = document.getElementById("dislikeBtn");
 const submitReview = document.getElementById("submitReview");
 const reviewComment = document.getElementById("reviewComment");
-const reviewsList = document.getElementById("reviewsList");
-const likesCount = document.getElementById("likesCount");
-const dislikesCount = document.getElementById("dislikesCount");
 
-likeBtn.onclick = ()=>selectedLike=true;
-dislikeBtn.onclick = ()=>selectedLike=false;
+likeBtn.onclick = async ()=>{
+  if(!currentUser) return alert("Login required");
+  selectedLike = true;
+  await saveReview("");
+};
+
+dislikeBtn.onclick = async ()=>{
+  if(!currentUser) return alert("Login required");
+  selectedLike = false;
+  await saveReview("");
+};
+
+submitReview.onclick = async ()=>{
+  if(!currentUser) return alert("Login required");
+  const comment = reviewComment.value.trim();
+  if(comment==="") return alert("Write a comment first");
+  if(selectedLike===null) selectedLike=true;
+  await saveReview(comment);
+  reviewComment.value="";
+};
+
+async function saveReview(comment){
+  const reviewId = `${productId}_${currentUser.uid}`;
+  await setDoc(doc(db,"reviews",reviewId),{
+    productId,
+    userId:currentUser.uid,
+    userEmail:currentUser.email,
+    like:selectedLike,
+    comment,
+    createdAt:serverTimestamp()
+  },{merge:true});
+  loadReviews();
+}
 
 async function loadReviews(){
   const q = query(collection(db,"reviews"),where("productId","==",productId));
@@ -208,35 +227,20 @@ async function loadReviews(){
   snap.forEach(d=>{
     const r=d.data();
     r.like?likes++:dislikes++;
-    reviewsList.innerHTML+=`
-      <div class="review">
-        ${r.like?'👍':'👎'} <strong>${r.userEmail}</strong><br>
-        ${r.comment}
-      </div>`;
+    if(r.comment){
+      reviewsList.innerHTML+=`
+        <div class="review">
+          ${r.like?'👍':'👎'} <strong>${r.userEmail}</strong><br>
+          ${r.comment}
+        </div>`;
+    }
   });
   likesCount.textContent=likes;
   dislikesCount.textContent=dislikes;
 }
 
-submitReview.onclick = async ()=>{
-  if(!currentUser) return alert("Login required");
-  if(selectedLike===null) return alert("Choose like or dislike");
-
-  const reviewId = `${productId}_${currentUser.uid}`;
-  await setDoc(doc(db,"reviews",reviewId),{
-    productId,
-    userId:currentUser.uid,
-    userEmail:currentUser.email,
-    like:selectedLike,
-    comment:reviewComment.value.trim(),
-    createdAt:serverTimestamp()
-  });
-
-  reviewComment.value="";
-  loadReviews();
-};
-
 loadProduct();
 </script>
+
 </body>
 </html>
