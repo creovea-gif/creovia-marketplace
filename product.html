@@ -19,7 +19,7 @@ body{
 .card{
   max-width:900px;
   margin:auto;
-  background:white;
+  background:#fff;
   border-radius:18px;
   padding:25px;
   box-shadow:0 15px 40px rgba(0,0,0,.08);
@@ -30,23 +30,14 @@ img{
   object-fit:contain;
   background:#f3f4f6;
   border-radius:14px;
-  margin-bottom:15px;
 }
-h1{margin-bottom:5px}
 .price{
   font-size:26px;
   font-weight:700;
   color:#059669;
 }
-.seller{
-  color:#6b7280;
-  margin-bottom:10px;
-}
-.stats{
-  display:flex;
-  gap:15px;
-  margin:15px 0;
-}
+.seller{color:#6b7280;margin-bottom:10px}
+.stats{display:flex;gap:15px;margin:15px 0}
 .stat{
   background:#f1f5f9;
   padding:8px 14px;
@@ -93,9 +84,9 @@ textarea{
 
 <div class="card">
   <h1 id="name">Loading...</h1>
-  <div class="seller">By: <span id="sellerEmail">Loading...</span></div>
+  <div class="seller">By: <span id="sellerEmail">...</span></div>
 
-  <img id="image" src="">
+  <img id="image">
   <p id="desc"></p>
   <div class="price" id="price">$0.00</div>
 
@@ -111,24 +102,24 @@ textarea{
   <h2>Reviews</h2>
   <div id="reviewsList"></div>
 
-  <h3>Your Review</h3>
+  <h3>Your Opinion</h3>
   <div class="review-actions">
     <button class="like" id="likeBtn">👍 Like</button>
     <button class="dislike" id="dislikeBtn">👎 Dislike</button>
   </div>
 
-  <textarea id="reviewComment" placeholder="Write your comment (optional)..."></textarea>
-  <button class="submit-review" id="submitReview">Submit Comment</button>
+  <textarea id="reviewComment" placeholder="Optional comment..."></textarea>
+  <button class="submit-review" id="submitReview">Save Comment</button>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import {
-  getFirestore, doc, setDoc, getDocs, query, where, collection, serverTimestamp
+  getFirestore, doc, setDoc, getDocs, query, where,
+  collection, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
-/* Firebase */
 const firebaseConfig = {
   apiKey: "AIzaSyCh2Pf1c1Gb7fQCQy64WmNYvWBKffwiuOs",
   authDomain: "creoveo-7da32.firebaseapp.com",
@@ -139,34 +130,33 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-/* Globals */
-const params = new URLSearchParams(window.location.search);
-const productId = params.get("id");
+const productId = new URLSearchParams(location.search).get("id");
+if(!productId) alert("Product not found");
 
-let currentUser = null;
-let selectedLike = null;
+let currentUser=null;
+let currentLike=null;
 
-onAuthStateChanged(auth,user=>currentUser=user);
+onAuthStateChanged(auth,u=>currentUser=u);
 
-/* ---------- PRODUCT ---------- */
+// ---------- LOAD PRODUCT ----------
 async function loadProduct(){
   const res = await fetch("https://backend-creovea.onrender.com/products");
   const products = await res.json();
   const product = products.find(p=>p.id==productId);
   if(!product) return alert("Product not found");
 
-  name.textContent = product.name;
-  desc.textContent = product.description;
-  price.textContent = "$"+Number(product.price).toFixed(2);
-  image.src = product.previewImage;
-  sellerEmail.textContent = product.sellerEmail || "Unknown";
+  name.textContent=product.name;
+  desc.textContent=product.description;
+  price.textContent="$"+product.price;
+  image.src=product.previewImage;
+  sellerEmail.textContent=product.sellerEmail || "Unknown";
 
   paypal.Buttons({
     createOrder:(d,a)=>a.order.create({
       purchase_units:[{amount:{value:product.price}}]
     }),
-    onApprove:async(d)=>{
-      const r = await fetch("https://backend-creovea.onrender.com/record-payment",{
+    onApprove:async d=>{
+      const r=await fetch("https://backend-creovea.onrender.com/record-payment",{
         method:"POST",
         headers:{'Content-Type':'application/json'},
         body:JSON.stringify({productId,orderId:d.orderID})
@@ -179,61 +169,43 @@ async function loadProduct(){
   loadReviews();
 }
 
-/* ---------- REVIEWS ---------- */
-const likeBtn = document.getElementById("likeBtn");
-const dislikeBtn = document.getElementById("dislikeBtn");
-const submitReview = document.getElementById("submitReview");
-const reviewComment = document.getElementById("reviewComment");
-
-likeBtn.onclick = async ()=>{
+// ---------- REVIEWS ----------
+async function saveReview(like,comment=""){
   if(!currentUser) return alert("Login required");
-  selectedLike = true;
-  await saveReview("");
-};
-
-dislikeBtn.onclick = async ()=>{
-  if(!currentUser) return alert("Login required");
-  selectedLike = false;
-  await saveReview("");
-};
-
-submitReview.onclick = async ()=>{
-  if(!currentUser) return alert("Login required");
-  const comment = reviewComment.value.trim();
-  if(comment==="") return alert("Write a comment first");
-  if(selectedLike===null) selectedLike=true;
-  await saveReview(comment);
-  reviewComment.value="";
-};
-
-async function saveReview(comment){
-  const reviewId = `${productId}_${currentUser.uid}`;
-  await setDoc(doc(db,"reviews",reviewId),{
+  const id=`${productId}_${currentUser.uid}`;
+  await setDoc(doc(db,"reviews",id),{
     productId,
     userId:currentUser.uid,
     userEmail:currentUser.email,
-    like:selectedLike,
+    like,
     comment,
     createdAt:serverTimestamp()
-  },{merge:true});
+  });
   loadReviews();
 }
 
+likeBtn.onclick=()=>{ currentLike=true; saveReview(true); };
+dislikeBtn.onclick=()=>{ currentLike=false; saveReview(false); };
+
+submitReview.onclick=()=>{
+  if(currentLike===null) return alert("Choose like or dislike first");
+  saveReview(currentLike,reviewComment.value.trim());
+  reviewComment.value="";
+};
+
 async function loadReviews(){
-  const q = query(collection(db,"reviews"),where("productId","==",productId));
-  const snap = await getDocs(q);
+  const q=query(collection(db,"reviews"),where("productId","==",productId));
+  const snap=await getDocs(q);
   let likes=0,dislikes=0;
   reviewsList.innerHTML="";
   snap.forEach(d=>{
     const r=d.data();
     r.like?likes++:dislikes++;
-    if(r.comment){
-      reviewsList.innerHTML+=`
-        <div class="review">
-          ${r.like?'👍':'👎'} <strong>${r.userEmail}</strong><br>
-          ${r.comment}
-        </div>`;
-    }
+    reviewsList.innerHTML+=`
+      <div class="review">
+        ${r.like?"👍":"👎"} <b>${r.userEmail}</b><br>
+        ${r.comment||""}
+      </div>`;
   });
   likesCount.textContent=likes;
   dislikesCount.textContent=dislikes;
