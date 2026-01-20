@@ -42,6 +42,29 @@ img {
     <p id="desc"></p>
     <h3 id="price"></h3>
 
+    <hr>
+
+<h3>Reviews</h3>
+
+<div id="reviewsList"></div>
+
+<div id="reviewForm" style="margin-top:15px;">
+    <p><strong>Your Review</strong></p>
+
+    <button id="likeBtn">👍 Like</button>
+    <button id="dislikeBtn">👎 Dislike</button>
+
+    <br><br>
+
+    <textarea id="reviewComment" placeholder="Write a comment..."
+      style="width:100%; padding:8px;"></textarea>
+
+    <br><br>
+
+    <button id="submitReview">Submit Review</button>
+</div>
+
+
     <!-- زر PayPal -->
     <div id="paypal-button-container"></div>
 </div>
@@ -95,6 +118,117 @@ fetch('https://backend-creovea.onrender.com/products')
         }
     }).render('#paypal-button-container');
 });
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import {
+  getAuth,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  getDocs,
+  query,
+  where,
+  collection,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCh2Pf1c1Gb7fQCQy64WmNYvWBKffwiuOs",
+  authDomain: "creoveo-7da32.firebaseapp.com",
+  projectId: "creoveo-7da32",
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser = null;
+let selectedLike = null;
+
+onAuthStateChanged(auth, user => {
+  currentUser = user;
+});
+
+
+    <script type="module">
+import {
+  doc,
+  setDoc,
+  getDocs,
+  query,
+  where,
+  collection,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+const likeBtn = document.getElementById('likeBtn');
+const dislikeBtn = document.getElementById('dislikeBtn');
+const submitBtn = document.getElementById('submitReview');
+
+likeBtn.onclick = () => selectedLike = true;
+dislikeBtn.onclick = () => selectedLike = false;
+
+// تحميل التقييمات
+async function loadReviews() {
+  const q = query(
+    collection(db, "reviews"),
+    where("productId", "==", productId)
+  );
+
+  const snap = await getDocs(q);
+  const list = document.getElementById('reviewsList');
+  list.innerHTML = '';
+
+  snap.forEach(doc => {
+    const r = doc.data();
+    list.innerHTML += `
+      <p>
+        ${r.like ? '👍' : '👎'}
+        <strong>${r.userEmail}</strong><br>
+        ${r.comment}
+      </p>
+      <hr>
+    `;
+  });
+}
+
+submitBtn.onclick = async () => {
+  if (!currentUser) {
+    alert('Login required');
+    return;
+  }
+
+  if (selectedLike === null) {
+    alert('Choose like or dislike');
+    return;
+  }
+
+  const comment = document.getElementById('reviewComment').value.trim();
+
+  const reviewId = `${productId}_${currentUser.uid}`;
+
+  await setDoc(doc(db, "reviews", reviewId), {
+    productId,
+    userId: currentUser.uid,
+    userEmail: currentUser.email,
+    like: selectedLike,
+    comment,
+    createdAt: serverTimestamp()
+  });
+
+  alert('Review submitted!');
+  loadReviews();
+};
+
+loadReviews();
+
+
+
+    
 </script>
 </body>
 </html>
