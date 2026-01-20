@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Product</title>
+
 <style>
 body {
     font-family: Arial, sans-serif;
@@ -20,19 +21,14 @@ img {
     width: 100%;
     border-radius: 8px;
 }
-.buy-btn {
-    margin-top: 15px;
-    padding: 12px;
-    width: 100%;
-    border: none;
-    background: #6366f1;
-    color: white;
-    font-size: 16px;
-    border-radius: 8px;
+button {
+    padding: 8px 12px;
+    margin-right: 5px;
     cursor: pointer;
 }
 </style>
 </head>
+
 <body>
 
 <div class="card">
@@ -44,41 +40,33 @@ img {
 
     <hr>
 
-<h3>Reviews</h3>
+    <h3>Reviews</h3>
+    <div id="reviewsList"></div>
 
-<div id="reviewsList"></div>
+    <div id="reviewForm">
+        <p><strong>Your Review</strong></p>
+        <button id="likeBtn">👍 Like</button>
+        <button id="dislikeBtn">👎 Dislike</button>
+        <br><br>
+        <textarea id="reviewComment" placeholder="Write a comment..."
+          style="width:100%; padding:8px;"></textarea>
+        <br><br>
+        <button id="submitReview">Submit Review</button>
+    </div>
 
-<div id="reviewForm" style="margin-top:15px;">
-    <p><strong>Your Review</strong></p>
+    <hr>
 
-    <button id="likeBtn">👍 Like</button>
-    <button id="dislikeBtn">👎 Dislike</button>
-
-    <br><br>
-
-    <textarea id="reviewComment" placeholder="Write a comment..."
-      style="width:100%; padding:8px;"></textarea>
-
-    <br><br>
-
-    <button id="submitReview">Submit Review</button>
-</div>
-
-
-    <!-- زر PayPal -->
     <div id="paypal-button-container"></div>
 </div>
 
-  <script src="https://www.paypal.com/sdk/js?client-id=Ady-fs_MNNG5Ue22tNNapD9abvFULboMBDy5vAbpDYt8jCVNkqeyS1hssK58OTIWLWQt5xHxZlcZ_hSB&currency=USD&intent=capture"></script>
+<!-- PayPal -->
+<script src="https://www.paypal.com/sdk/js?client-id=Ady-fs_MNNG5Ue22tNNapD9abvFULboMBDy5vAbpDYt8jCVNkqeyS1hssK58OTIWLWQt5xHxZlcZ_hSB&currency=USD&intent=capture"></script>
+
+<!-- 🟢 Script 1: المنتج + PayPal -->
 <script>
 const params = new URLSearchParams(window.location.search);
 const productId = params.get('id');
 
-if (!productId) {
-    alert('Product not found');
-}
-
-// جلب بيانات المنتج
 fetch('https://backend-creovea.onrender.com/products')
 .then(res => res.json())
 .then(products => {
@@ -86,12 +74,11 @@ fetch('https://backend-creovea.onrender.com/products')
     if (!product) return alert('Product not found');
 
     document.getElementById('name').textContent = product.name;
-    document.getElementById('seller').textContent = 'Seller: ' + product.seller;
+    document.getElementById('seller').textContent = 'Seller: ' + product.sellerEmail;
     document.getElementById('desc').textContent = product.description;
     document.getElementById('price').textContent = '$' + product.price;
     document.getElementById('image').src = product.previewImage;
 
-    // PayPal
     paypal.Buttons({
         createOrder: (data, actions) => {
             return actions.order.create({
@@ -118,22 +105,15 @@ fetch('https://backend-creovea.onrender.com/products')
         }
     }).render('#paypal-button-container');
 });
+</script>
 
+<!-- 🟣 Script 2: Firebase + Reviews -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import {
-  getAuth,
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-import {
-  getFirestore,
-  doc,
-  setDoc,
-  getDocs,
-  query,
-  where,
-  collection,
-  serverTimestamp
+  getFirestore, doc, setDoc, getDocs,
+  query, where, collection, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -153,62 +133,28 @@ onAuthStateChanged(auth, user => {
   currentUser = user;
 });
 
+document.getElementById('likeBtn').onclick = () => selectedLike = true;
+document.getElementById('dislikeBtn').onclick = () => selectedLike = false;
 
-    <script type="module">
-import {
-  doc,
-  setDoc,
-  getDocs,
-  query,
-  where,
-  collection,
-  serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-
-const likeBtn = document.getElementById('likeBtn');
-const dislikeBtn = document.getElementById('dislikeBtn');
-const submitBtn = document.getElementById('submitReview');
-
-likeBtn.onclick = () => selectedLike = true;
-dislikeBtn.onclick = () => selectedLike = false;
-
-// تحميل التقييمات
 async function loadReviews() {
-  const q = query(
-    collection(db, "reviews"),
-    where("productId", "==", productId)
-  );
-
+  const q = query(collection(db, "reviews"), where("productId", "==", productId));
   const snap = await getDocs(q);
   const list = document.getElementById('reviewsList');
   list.innerHTML = '';
 
-  snap.forEach(doc => {
-    const r = doc.data();
+  snap.forEach(d => {
+    const r = d.data();
     list.innerHTML += `
-      <p>
-        ${r.like ? '👍' : '👎'}
-        <strong>${r.userEmail}</strong><br>
-        ${r.comment}
-      </p>
-      <hr>
+      <p>${r.like ? '👍' : '👎'} <strong>${r.userEmail}</strong><br>${r.comment}</p><hr>
     `;
   });
 }
 
-submitBtn.onclick = async () => {
-  if (!currentUser) {
-    alert('Login required');
-    return;
-  }
-
-  if (selectedLike === null) {
-    alert('Choose like or dislike');
-    return;
-  }
+document.getElementById('submitReview').onclick = async () => {
+  if (!currentUser) return alert('Login required');
+  if (selectedLike === null) return alert('Choose like or dislike');
 
   const comment = document.getElementById('reviewComment').value.trim();
-
   const reviewId = `${productId}_${currentUser.uid}`;
 
   await setDoc(doc(db, "reviews", reviewId), {
@@ -220,15 +166,12 @@ submitBtn.onclick = async () => {
     createdAt: serverTimestamp()
   });
 
-  alert('Review submitted!');
+  alert('Review submitted');
   loadReviews();
 };
 
 loadReviews();
-
-
-
-    
 </script>
+
 </body>
 </html>
