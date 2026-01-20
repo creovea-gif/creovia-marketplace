@@ -3,34 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <title>Product</title>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-import {
-  getFirestore,
-  doc,
-  collection,
-  getDocs,
-  setDoc
-} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyCh2Pf1c1Gb7fQCQy64WmNYvWBKffwiuOs",
-  authDomain: "creoveo-7da32.firebaseapp.com",
-  projectId: "creoveo-7da32"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-window.currentUser = null;
-onAuthStateChanged(auth, user => {
-  window.currentUser = user;
-});
-</script>
-
 <style>
 body {
     font-family: Arial, sans-serif;
@@ -59,24 +31,6 @@ img {
     border-radius: 8px;
     cursor: pointer;
 }
-.rating-box {
-    margin-top: 25px;
-    padding-top: 15px;
-    border-top: 1px solid #ddd;
-}
-.rating-box textarea {
-    width: 100%;
-    padding: 8px;
-}
-.rating-actions button {
-    margin-right: 10px;
-    padding: 8px 14px;
-    cursor: pointer;
-}
-.stats {
-    margin-top: 10px;
-    font-weight: bold;
-}
 </style>
 </head>
 <body>
@@ -88,62 +42,39 @@ img {
     <p id="desc"></p>
     <h3 id="price"></h3>
 
+    <!-- زر PayPal -->
     <div id="paypal-button-container"></div>
-
-    <!-- ⭐ التقييم -->
-    <div class="rating-box">
-        <h3>Ratings</h3>
-        <div class="stats">
-            👍 <span id="likes">0</span> |
-            👎 <span id="dislikes">0</span>
-        </div>
-
-        <textarea id="comment" placeholder="Leave a comment (optional)"></textarea>
-
-        <div class="rating-actions">
-            <button id="likeBtn">👍 Like</button>
-            <button id="dislikeBtn">👎 Dislike</button>
-        </div>
-    </div>
 </div>
 
-<script src="https://www.paypal.com/sdk/js?client-id=Ady-fs_MNNG5Ue22tNNapD9abvFULboMBDy5vAbpDYt8jCVNkqeyS1hssK58OTIWLWQt5xHxZlcZ_hSB&currency=USD&intent=capture"></script>
-
-<script type="module">
-import {
-  getFirestore,
-  collection,
-  doc,
-  getDocs,
-  setDoc
-} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-
-const db = getFirestore();
-
+  <script src="https://www.paypal.com/sdk/js?client-id=Ady-fs_MNNG5Ue22tNNapD9abvFULboMBDy5vAbpDYt8jCVNkqeyS1hssK58OTIWLWQt5xHxZlcZ_hSB&currency=USD&intent=capture"></script>
+<script>
 const params = new URLSearchParams(window.location.search);
 const productId = params.get('id');
 
-let currentProduct = null;
+if (!productId) {
+    alert('Product not found');
+}
 
-// 🔹 تحميل المنتج
+// جلب بيانات المنتج
 fetch('https://backend-creovea.onrender.com/products')
 .then(res => res.json())
 .then(products => {
-    currentProduct = products.find(p => p.id === productId);
-    if (!currentProduct) return alert('Product not found');
+    const product = products.find(p => p.id === productId);
+    if (!product) return alert('Product not found');
 
-    name.textContent = currentProduct.name;
-    seller.textContent = 'Seller: ' + currentProduct.sellerEmail;
-    desc.textContent = currentProduct.description;
-    price.textContent = '$' + currentProduct.price;
-    image.src = currentProduct.previewImage;
+    document.getElementById('name').textContent = product.name;
+    document.getElementById('seller').textContent = 'Seller: ' + product.seller;
+    document.getElementById('desc').textContent = product.description;
+    document.getElementById('price').textContent = '$' + product.price;
+    document.getElementById('image').src = product.previewImage;
 
-    loadRatings();
-
+    // PayPal
     paypal.Buttons({
         createOrder: (data, actions) => {
             return actions.order.create({
-                purchase_units: [{ amount: { value: currentProduct.price } }]
+                purchase_units: [{
+                    amount: { value: product.price }
+                }]
             });
         },
         onApprove: async (data) => {
@@ -151,57 +82,19 @@ fetch('https://backend-creovea.onrender.com/products')
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
-                    productId: currentProduct.id,
+                    productId: product.id,
                     orderId: data.orderID
                 })
             });
             const result = await res.json();
             if (result.success) {
                 window.location.href = result.downloadUrl;
+            } else {
+                alert('Payment failed');
             }
         }
     }).render('#paypal-button-container');
 });
-
-// 🔹 تحميل التقييمات
-async function loadRatings() {
-    const snap = await getDocs(collection(db, 'products', productId, 'ratings'));
-    let likes = 0, dislikes = 0;
-
-    snap.forEach(doc => {
-        doc.data().like ? likes++ : dislikes++;
-    });
-
-    document.getElementById('likes').textContent = likes;
-    document.getElementById('dislikes').textContent = dislikes;
-}
-
-// 🔹 إرسال التقييم
-async function submitRating(isLike) {
-    if (!window.currentUser) {
-        alert('Login required');
-        return;
-    }
-
-    try {
-        await setDoc(
-            doc(db, 'products', productId, 'ratings', window.currentUser.uid),
-            {
-                like: isLike,
-                comment: document.getElementById('comment').value,
-                createdAt: Date.now()
-            }
-        );
-        alert('Thank you for rating');
-        loadRatings();
-    } catch {
-        alert('You already rated this product');
-    }
-}
-
-document.getElementById('likeBtn').onclick = () => submitRating(true);
-document.getElementById('dislikeBtn').onclick = () => submitRating(false);
 </script>
-
 </body>
 </html>
