@@ -42,6 +42,52 @@ img {
     <p id="desc"></p>
     <h3 id="price"></h3>
 
+<hr>
+
+<h3>Reviews</h3>
+
+<div id="reviews-summary">
+  <p id="reviews-count">0 reviews</p>
+</div>
+
+<div id="review-form" style="margin-top:15px;">
+  <textarea id="review-text" placeholder="Write your note..." style="width:100%;padding:8px;"></textarea>
+
+  <div style="margin-top:10px;">
+    <button id="like-btn">👍 Like</button>
+    <button id="dislike-btn">👎 Dislike</button>
+  </div>
+
+  <p id="review-message" style="color:red;margin-top:8px;"></p>
+</div>
+
+<div id="reviews-list" style="margin-top:20px;"></div>
+
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCh2Pf1c1Gb7fQCQy64WmNYvWBKffwiuOs",
+  authDomain: "creoveo-7da32.firebaseapp.com",
+  projectId: "creoveo-7da32",
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser = null;
+
+onAuthStateChanged(auth, user => {
+  currentUser = user;
+});
+</script>
+
+    
+
     <!-- زر PayPal -->
     <div id="paypal-button-container"></div>
 </div>
@@ -95,6 +141,70 @@ fetch('https://backend-creovea.onrender.com/products')
         }
     }).render('#paypal-button-container');
 });
+
+
+<script type="module">
+import { doc, setDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+const likeBtn = document.getElementById('like-btn');
+const dislikeBtn = document.getElementById('dislike-btn');
+const reviewText = document.getElementById('review-text');
+const message = document.getElementById('review-message');
+const reviewsList = document.getElementById('reviews-list');
+const reviewsCount = document.getElementById('reviews-count');
+
+async function loadReviews() {
+  const snap = await getDocs(collection(db, 'products', productId, 'reviews'));
+  reviewsList.innerHTML = '';
+  reviewsCount.textContent = `${snap.size} reviews`;
+
+  snap.forEach(doc => {
+    const r = doc.data();
+    const div = document.createElement('div');
+    div.style.borderBottom = '1px solid #ddd';
+    div.style.padding = '8px 0';
+    div.innerHTML = `
+      <strong>${r.type === 'like' ? '👍' : '👎'}</strong>
+      <p>${r.text}</p>
+    `;
+    reviewsList.appendChild(div);
+  });
+}
+
+async function submitReview(type) {
+  if (!currentUser) {
+    message.textContent = 'You must be logged in';
+    return;
+  }
+
+  const text = reviewText.value.trim();
+  if (!text) {
+    message.textContent = 'Write a note first';
+    return;
+  }
+
+  const reviewRef = doc(db, 'products', productId, 'reviews', currentUser.uid);
+
+  await setDoc(reviewRef, {
+    userId: currentUser.uid,
+    type,
+    text,
+    createdAt: new Date()
+  });
+
+  message.style.color = 'green';
+  message.textContent = 'Review submitted ✅';
+  reviewText.value = '';
+  loadReviews();
+}
+
+likeBtn.onclick = () => submitReview('like');
+dislikeBtn.onclick = () => submitReview('dislike');
+
+loadReviews();
+
+
+    
 </script>
 </body>
 </html>
