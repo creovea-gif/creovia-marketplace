@@ -185,7 +185,12 @@ onAuthStateChanged(auth, user => currentUser = user);
 fetch('https://backend-creovea.onrender.com/products')
 .then(res => res.json())
 .then(products => {
-  const product = products.find(p => p.id === productId);
+  const product = products.find(p =>
+  p.id == productId ||
+  p._id == productId ||
+  p.productId == productId
+);
+
   if (!product) return alert('Product not found');
 
   name.textContent = product.name;
