@@ -2,87 +2,90 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Product | CREOVIA</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<title>Product | CREOVIA</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <!-- PayPal SDK -->
 <script src="https://www.paypal.com/sdk/js?client-id=Ady-fs_MNNG5Ue22tNNapD9abvFULboMBDy5vAbpDYt8jCVNkqeyS1hssK58OTIWLWQt5xHxZlcZ_hSB&currency=USD&intent=capture"></script>
 
 <style>
 body{
-    font-family: Inter, sans-serif;
-    background:#f9fafb;
-    padding:30px;
+  font-family: 'Inter', sans-serif;
+  background:#f9fafb;
+  padding:20px;
 }
 .card{
-    max-width:900px;
-    margin:auto;
-    background:white;
-    border-radius:18px;
-    padding:25px;
-    box-shadow:0 15px 40px rgba(0,0,0,.08);
+  max-width:900px;
+  margin:auto;
+  background:white;
+  border-radius:18px;
+  padding:25px;
+  box-shadow:0 15px 40px rgba(0,0,0,.08);
 }
 img{
-    width:100%;
-    max-height:400px;
-    object-fit:contain;
-    background:#f3f4f6;
-    border-radius:14px;
-    margin-bottom:15px;
+  width:100%;
+  max-height:400px;
+  object-fit:contain;
+  background:#f3f4f6;
+  border-radius:14px;
+  margin-bottom:15px;
+}
+h1{
+  margin-bottom:5px;
 }
 .price{
-    font-size:26px;
-    font-weight:700;
-    color:#059669;
+  font-size:26px;
+  font-weight:700;
+  color:#059669;
 }
 .seller{
-    color:#6b7280;
-    margin-bottom:10px;
+  color:#6b7280;
+  margin-bottom:10px;
 }
 .stats{
-    display:flex;
-    gap:15px;
-    margin:15px 0;
+  display:flex;
+  gap:15px;
+  margin:15px 0;
 }
 .stat{
-    background:#f1f5f9;
-    padding:8px 14px;
-    border-radius:999px;
-    font-weight:600;
+  background:#f1f5f9;
+  padding:8px 14px;
+  border-radius:999px;
+  font-weight:600;
 }
 .review{
-    background:#f9fafb;
-    padding:12px;
-    border-radius:12px;
-    margin-bottom:10px;
+  background:#f9fafb;
+  padding:12px;
+  border-radius:12px;
+  margin-bottom:10px;
 }
 .review-actions button{
-    padding:10px 18px;
-    border:none;
-    border-radius:999px;
-    font-size:16px;
-    cursor:pointer;
+  padding:10px 18px;
+  border:none;
+  border-radius:999px;
+  font-size:16px;
+  cursor:pointer;
+  margin-right:10px;
 }
 .like{background:#dcfce7}
 .dislike{background:#fee2e2}
 textarea{
-    width:100%;
-    padding:10px;
-    border-radius:10px;
-    border:1px solid #d1d5db;
-    margin-top:10px;
+  width:100%;
+  padding:10px;
+  border-radius:10px;
+  border:1px solid #d1d5db;
+  margin-top:10px;
 }
 .submit-review{
-    width:100%;
-    margin-top:10px;
-    padding:12px;
-    background:#111827;
-    color:white;
-    border:none;
-    border-radius:12px;
-    cursor:pointer;
+  width:100%;
+  margin-top:10px;
+  padding:12px;
+  background:#111827;
+  color:white;
+  border:none;
+  border-radius:12px;
+  cursor:pointer;
 }
 </style>
 </head>
@@ -90,36 +93,35 @@ textarea{
 <body>
 
 <div class="card">
-    <h1 id="name"></h1>
-    <div class="seller">By: <span id="sellerEmail"></span></div>
+  <h1 id="name">Loading...</h1>
+  <div class="seller">By: <span id="sellerEmail">Loading...</span></div>
 
-    <img id="image">
-    <p id="desc"></p>
-    <div class="price" id="price"></div>
+  <img id="image" src="" alt="Product Preview">
+  <p id="desc"></p>
+  <div class="price" id="price">$0.00</div>
 
-    <div class="stats">
-        <div class="stat">👍 <span id="likesCount">0</span></div>
-        <div class="stat">👎 <span id="dislikesCount">0</span></div>
-    </div>
+  <div class="stats">
+    <div class="stat">👍 <span id="likesCount">0</span></div>
+    <div class="stat">👎 <span id="dislikesCount">0</span></div>
+  </div>
 
-    <div id="paypal-button-container"></div>
+  <div id="paypal-button-container"></div>
 
-    <hr style="margin:25px 0">
+  <hr style="margin:25px 0">
 
-    <h2>Reviews</h2>
-    <div id="reviewsList"></div>
+  <h2>Reviews</h2>
+  <div id="reviewsList"></div>
 
-    <h3>Your Review</h3>
-    <div class="review-actions">
-        <button class="like" id="likeBtn">👍 Like</button>
-        <button class="dislike" id="dislikeBtn">👎 Dislike</button>
-    </div>
+  <h3>Your Review</h3>
+  <div class="review-actions">
+    <button class="like" id="likeBtn">👍 Like</button>
+    <button class="dislike" id="dislikeBtn">👎 Dislike</button>
+  </div>
 
-    <textarea id="reviewComment" placeholder="Write your comment..."></textarea>
-    <button class="submit-review" id="submitReview">Submit Review</button>
+  <textarea id="reviewComment" placeholder="Write your comment..."></textarea>
+  <button class="submit-review" id="submitReview">Submit Review</button>
 </div>
 
-<!-- Firebase -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
@@ -127,12 +129,12 @@ import {
   getFirestore, doc, setDoc, getDocs, query, where, collection, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
+// Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyCh2Pf1c1Gb7fQCQy64WmNYvWBKffwiuOs",
   authDomain: "creoveo-7da32.firebaseapp.com",
   projectId: "creoveo-7da32"
 };
-
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -140,58 +142,69 @@ const db = getFirestore(app);
 const params = new URLSearchParams(window.location.search);
 const productId = params.get('id');
 
-if(!productId){
-    alert("Product not found");
-}
+if(!productId){ alert("Product not found"); }
 
 let currentUser = null;
 let selectedLike = null;
 
 onAuthStateChanged(auth, user => currentUser = user);
 
-/* ---------- LOAD PRODUCT ---------- */
-const productRes = await fetch("https://backend-creovea.onrender.com/products");
-const products = await productRes.json();
-const product = products.find(p => p.id === productId);
+// ---------- LOAD PRODUCT ----------
+async function loadProduct(){
+  try{
+    const res = await fetch('https://backend-creovea.onrender.com/products');
+    const products = await res.json();
+    const product = products.find(p=>p.id==productId);
+    if(!product) return alert("Product not found");
 
-if(!product){
-    alert("Product not found");
+    document.getElementById('name').textContent = product.name;
+    document.getElementById('desc').textContent = product.description;
+    document.getElementById('price').textContent = '$'+Number(product.price).toFixed(2);
+    document.getElementById('image').src = product.previewImage;
+    document.getElementById('sellerEmail').textContent = product.sellerEmail || "Unknown";
+
+    // ---------- PAYPAL ----------
+    paypal.Buttons({
+      createOrder: (d,a)=>a.order.create({
+        purchase_units:[{amount:{value:product.price}}]
+      }),
+      onApprove: async (d)=>{
+        const res = await fetch("https://backend-creovea.onrender.com/record-payment",{
+          method:"POST",
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({productId,orderId:d.orderID})
+        });
+        const r = await res.json();
+        if(r.success) window.location.href=r.downloadUrl;
+        else alert("Payment failed");
+      }
+    }).render("#paypal-button-container");
+
+    loadReviews();
+
+  }catch(err){
+    console.error(err);
+    alert("Failed to load product");
+  }
 }
 
-name.textContent = product.name;
-desc.textContent = product.description;
-price.textContent = "$" + Number(product.price).toFixed(2);
-image.src = product.previewImage;
-sellerEmail.textContent = product.sellerEmail || "Unknown";
+// ---------- REVIEWS ----------
+const likeBtn = document.getElementById("likeBtn");
+const dislikeBtn = document.getElementById("dislikeBtn");
+const submitReview = document.getElementById("submitReview");
+const reviewComment = document.getElementById("reviewComment");
+const reviewsList = document.getElementById("reviewsList");
+const likesCount = document.getElementById("likesCount");
+const dislikesCount = document.getElementById("dislikesCount");
 
-/* ---------- PAYPAL ---------- */
-paypal.Buttons({
-  createOrder: (d,a)=>a.order.create({
-    purchase_units:[{amount:{value:product.price}}]
-  }),
-  onApprove: async (d)=>{
-    const res = await fetch("https://backend-creovea.onrender.com/record-payment",{
-      method:"POST",
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({productId,orderId:d.orderID})
-    });
-    const r = await res.json();
-    if(r.success) window.location.href = r.downloadUrl;
-    else alert("Payment failed");
-  }
-}).render("#paypal-button-container");
-
-/* ---------- REVIEWS ---------- */
 likeBtn.onclick = ()=>selectedLike=true;
 dislikeBtn.onclick = ()=>selectedLike=false;
 
 async function loadReviews(){
   const q = query(collection(db,"reviews"),where("productId","==",productId));
   const snap = await getDocs(q);
-
   let likes=0,dislikes=0;
   reviewsList.innerHTML="";
-
   snap.forEach(d=>{
     const r=d.data();
     r.like?likes++:dislikes++;
@@ -201,7 +214,6 @@ async function loadReviews(){
         ${r.comment}
       </div>`;
   });
-
   likesCount.textContent=likes;
   dislikesCount.textContent=dislikes;
 }
@@ -210,7 +222,8 @@ submitReview.onclick = async ()=>{
   if(!currentUser) return alert("Login required");
   if(selectedLike===null) return alert("Choose like or dislike");
 
-  await setDoc(doc(db,"reviews",`${productId}_${currentUser.uid}`),{
+  const reviewId = `${productId}_${currentUser.uid}`;
+  await setDoc(doc(db,"reviews",reviewId),{
     productId,
     userId:currentUser.uid,
     userEmail:currentUser.email,
@@ -223,8 +236,7 @@ submitReview.onclick = async ()=>{
   loadReviews();
 };
 
-loadReviews();
+loadProduct();
 </script>
-
 </body>
 </html>
