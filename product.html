@@ -110,6 +110,17 @@ textarea{
   object-fit:contain;
 }
 
+  .pages-info{
+  margin-top:8px;
+  font-weight:600;
+  color:#374151;
+  background:#eef2ff;
+  display:inline-block;
+  padding:6px 14px;
+  border-radius:999px;
+}
+
+  
 </style>
 </head>
 
@@ -130,6 +141,11 @@ textarea{
   <img id="image" src="" alt="Product Preview">
   <p id="desc"></p>
   <div class="price" id="price">$0.00</div>
+
+  <div id="pagesInfo" class="pages-info" style="display:none;">
+  📄 <span id="pagesCount"></span> pages
+</div>
+
 
   <div class="stats">
     <div class="stat">👍 <span id="likesCount">0</span></div>
@@ -194,6 +210,13 @@ async function loadProduct(){
     document.getElementById('image').src = product.previewImage;
     document.getElementById('sellerEmail').textContent = product.sellerEmail || "Unknown";
 
+// ---------- PAGES ----------
+if (product.pages) {
+  document.getElementById('pagesCount').textContent = product.pages;
+  document.getElementById('pagesInfo').style.display = 'inline-block';
+}
+
+    
     // ---------- PAYPAL ----------
     paypal.Buttons({
       createOrder: (d,a)=>a.order.create({
