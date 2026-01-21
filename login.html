@@ -267,6 +267,26 @@ acceptTerms.addEventListener("change", () => {
   line-height: 1.5;
 }
 
+.brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.logo-img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+}
+
+.logo span {
+  font-size: 2.6rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+    
   </style>
 </head>
 <body>
@@ -274,7 +294,11 @@ acceptTerms.addEventListener("change", () => {
  
   <div class="login-container">
   
-    <div class="logo">CREOVIA</div>
+   <div class="logo brand">
+  <img src="assets/logo2.png" alt="CREOVIA Logo" class="logo-img">
+  <span>CREOVIA</span>
+</div>
+
     <h1>Login or Sign Up</h1>
     <div class="seller-note">
   ⚠️ <strong>Important for sellers:</strong><br>
