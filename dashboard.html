@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - CREOVIA</title>
+
+    <link rel="icon" type="image/png" href="assets/logo2.png">
+
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -161,16 +165,33 @@
                 font-size: 0.95rem;
             }
         }
+
+.brand{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo2{
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+}
+
+        
     </style>
 </head>
 <body>
 
     <header>
         <div class="container">
-            <h1>CREOVIA</h1>
+            <div class="brand">
+    <img src="assets/logo2.png" alt="CREOVIA logo" class="logo2">
+    <h1>CREOVIA</h1>
+</div>
+
             <nav>
                 <a href="index.html">Home</a>
-                <a href="categories.html">Categories</a>
                 <a href="index.html#upload-section">Upload</a>
                 <a href="dashboard.html">Dashboard</a>
                 <a href="contact.html">Contact</a>
