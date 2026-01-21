@@ -419,16 +419,53 @@
     background: #4f46e5;
 }
 
+        .brand{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo2{
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+}
+
+
+        nav a,
+button,
+.filter-btn,
+.submit-btn,
+.share-btn {
+    transition: all 0.25s ease;
+}
+
+nav a:hover {
+    transform: translateY(-1px);
+}
+
+button:hover,
+.filter-btn:hover,
+.submit-btn:hover,
+.share-btn:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+        
         
     </style>
 </head>
 <body>
     <header>
         <div class="container">
-            <h1>CREOVIA</h1>
+            <div class="brand">
+    <img src="assets/logo2.png" alt="CREOVIA logo" class="logo2">
+    <h1>CREOVIA</h1>
+</div>
+
             <nav>
                 <a href="index.html">Home</a>
-                <a href="categories.html">Categories</a>
                 <a href="#upload-section">Upload</a>
                 <a href="#" onclick="goToDashboard()">Dashboard</a>
 
@@ -770,6 +807,7 @@ function goToDashboard() {
     </script>
 </body>
 </html>
+
 
 
 
