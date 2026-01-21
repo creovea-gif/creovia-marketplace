@@ -38,6 +38,14 @@
       const statusText    = document.getElementById("status-text");
       const submitBtn     = document.getElementById("submitBtn");
 
+      const acceptTerms = document.getElementById("acceptTerms");
+submitBtn.disabled = true;
+
+acceptTerms.addEventListener("change", () => {
+  submitBtn.disabled = !acceptTerms.checked;
+});
+
+
       // إذا كان المستخدم مسجل دخول بالفعل → انتقل مباشرة للصفحة الرئيسية
       onAuthStateChanged(auth, (user) => {
         if (user) {
@@ -47,6 +55,12 @@
 
       loginForm.addEventListener("submit", async (e) => {
         e.preventDefault();
+
+        const termsAccepted = document.getElementById("acceptTerms").checked;
+  if (!termsAccepted) {
+    errorMsg.textContent = "You must agree to the Terms & Conditions to continue.";
+    return;
+  }
 
         const email    = emailInput.value.trim();
         const password = passwordInput.value;
@@ -293,6 +307,17 @@
       <div id="error-message"></div>
       <div id="status-text"></div>
 
+<div style="margin-top:1.2rem; display:flex; align-items:flex-start; gap:10px;">
+  <input type="checkbox" id="acceptTerms" style="margin-top:4px;">
+  <label for="acceptTerms" style="font-size:0.9rem; color:#374151; line-height:1.4;">
+    I agree to the 
+    <a href="Terms_&_Conditions.html" target="_blank" style="color:#6d28d9; font-weight:600;">
+      Terms & Conditions
+    </a>
+  </label>
+</div>
+
+      
       <button type="submit" id="submitBtn">Login / Sign Up</button>
     </form>
 
