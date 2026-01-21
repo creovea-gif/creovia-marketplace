@@ -544,6 +544,17 @@ button:hover,
                     <label>Price (USD)</label>
                     <input type="number" id="productPrice" placeholder="19.99" min="0.99" step="0.01" required>
                 </div>
+
+                <div class="form-group">
+    <label>Number of Pages (optional)</label>
+    <input
+        type="number"
+        id="productPages"
+        placeholder="e.g. 120"
+        min="1"
+    >
+</div>
+
                 <button type="submit" class="submit-btn">Upload Product</button>
             </form>
         </section>
@@ -755,6 +766,13 @@ shareBtn.addEventListener('click', (e) => {
             formData.append('desc', document.getElementById('productDesc').value.trim());
             formData.append('type', document.getElementById('productType').value);
             formData.append('price', document.getElementById('productPrice').value);
+
+const pagesValue = document.getElementById('productPages').value;
+if (pagesValue) {
+    formData.append('pages', pagesValue);
+}
+
+            
            if (!window.currentUser) {
     alert('You must be logged in to upload a product.');
     submitBtn.disabled = false;
@@ -808,6 +826,7 @@ function goToDashboard() {
     </script>
 </body>
 </html>
+
 
 
 
