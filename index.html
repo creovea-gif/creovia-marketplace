@@ -642,7 +642,11 @@ card.innerHTML = `
         <h3>${name}</h3>
         <span class="type-badge">${p.type || 'Unknown'}</span>
         <div class="sales-count">Sales: ${salesCount}</div>
-        <div class="price">$${price}</div>
+       <div class="price">$${price}</div>
+
+${p.pages ? `<div class="seller-name">📄 ${p.pages} pages</div>` : ''}
+
+
         <div class="seller-name" style="margin-top:0.5rem; font-size:0.9rem; color:#6b7280;">By: ${sellerName}</div>
         <div class="buy-btn-container" id="paypal-button-${productId}"></div>
 
@@ -826,6 +830,7 @@ function goToDashboard() {
     </script>
 </body>
 </html>
+
 
 
 
