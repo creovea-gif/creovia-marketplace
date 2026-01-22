@@ -555,7 +555,24 @@ button:hover,
     >
 </div>
 
-                <button type="submit" class="submit-btn">Upload Product</button>
+<div class="form-group" style="margin-top:1.5rem;">
+    <label style="display:flex; gap:10px; align-items:flex-start; font-weight:500;">
+        <input type="checkbox" id="acceptSellerTerms" style="margin-top:4px;">
+        <span>
+            I confirm that I own full rights to this product and agree to the
+            <a href="Terms_&_Conditions.html" target="_blank" style="color:#6d28d9; font-weight:600;">
+                Terms & Conditions
+            </a>.
+            Any stolen or illegal content may result in account suspension and withheld earnings.
+        </span>
+    </label>
+</div>
+
+                
+                <button type="submit" class="submit-btn" id="uploadBtn" disabled>
+    Upload Product
+</button>
+
             </form>
         </section>
     </main>
@@ -754,8 +771,25 @@ shareBtn.addEventListener('click', (e) => {
 }
 
         document.getElementById('searchInput').addEventListener('input', updateProductsDisplay);
+
+        // تفعيل زر الرفع فقط بعد الموافقة على الشروط
+const termsCheckbox = document.getElementById("acceptSellerTerms");
+const uploadBtn = document.getElementById("uploadBtn");
+
+termsCheckbox.addEventListener("change", () => {
+    uploadBtn.disabled = !termsCheckbox.checked;
+});
+
+        
         document.getElementById('uploadForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+
+if (!document.getElementById("acceptSellerTerms").checked) {
+    alert("You must agree to the Terms & Conditions before uploading.");
+    return;
+}
+
+            
             const submitBtn = document.querySelector('.submit-btn');
             const originalText = submitBtn.textContent;
             submitBtn.disabled = true;
@@ -830,6 +864,7 @@ function goToDashboard() {
     </script>
 </body>
 </html>
+
 
 
 
