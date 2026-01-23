@@ -299,7 +299,17 @@
 
     async function loadDashboard() {
         try {
-            const res = await fetch(`https://backend-creovea.onrender.com/seller-dashboard?email=${currentUser.email}`);
+           const token = await currentUser.getIdToken();
+
+const res = await fetch(
+  'https://backend-creovea.onrender.com/seller-dashboard',
+  {
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  }
+);
+
             if (!res.ok) throw new Error('Failed to fetch dashboard data');
             const data = await res.json();
 
