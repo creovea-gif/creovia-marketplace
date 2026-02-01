@@ -302,7 +302,8 @@
            const token = await currentUser.getIdToken();
 
 const res = await fetch(
-  'https://backend-creovea.onrender.com/seller-dashboard',
+  'https://api.creovia.uk
+/seller-dashboard',
   {
     headers: {
       'Authorization': `Bearer ${token}`
@@ -357,7 +358,8 @@ const res = await fetch(
     const token = await currentUser.getIdToken();
 
     const res = await fetch(
-      'https://backend-creovea.onrender.com/request-payout',
+      'https://api.creovia.uk
+/request-payout',
       {
         method: 'POST',
         headers: {
