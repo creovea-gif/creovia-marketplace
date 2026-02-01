@@ -618,7 +618,8 @@ button:hover,
         let currentFilter = 'all';
         async function loadProducts() {
             try {
-                const res = await fetch('https://backend-creovea.onrender.com/products');
+                const res = await fetch('https://api.creovia.uk
+/products');
                 if (!res.ok) throw new Error('Failed to fetch products');
                 allProducts = await res.json();
                 updateProductsDisplay();
@@ -710,7 +711,8 @@ shareBtn.addEventListener('click', (e) => {
         // ✅ هنا تأكد أن productId صحيح
         console.log('Sending payment for productId:', productId); // هذا سيساعدك على تتبع
 
-        return fetch('https://backend-creovea.onrender.com/record-payment', {
+        return fetch('https://api.creovia.uk
+/record-payment', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -827,7 +829,8 @@ if (pagesValue) {
                // 🔐 نحصل على Firebase Token
 const token = await window.currentUser.getIdToken();
 
-const response = await fetch('https://backend-creovea.onrender.com/upload', {
+const response = await fetch('https://api.creovia.uk
+/upload', {
     method: 'POST',
     headers: {
         'Authorization': 'Bearer ' + token // ✅ هذا هو الحل
@@ -871,6 +874,7 @@ function goToDashboard() {
     </script>
 </body>
 </html>
+
 
 
 
