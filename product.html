@@ -199,8 +199,7 @@ onAuthStateChanged(auth, user => currentUser = user);
 // ---------- LOAD PRODUCT ----------
 async function loadProduct(){
   try{
-    const res = await fetch('https://api.creovia.uk
-/products');
+    const res = await fetch('https://api.creovia.uk/products');
     const products = await res.json();
     const product = products.find(p=>p.id==productId);
     if(!product) return alert("Product not found");
@@ -224,8 +223,7 @@ if (product.pages) {
         purchase_units:[{amount:{value:product.price}}]
       }),
       onApprove: async (d)=>{
-        const res = await fetch("https://api.creovia.uk
-/record-payment",{
+        const res = await fetch("https://api.creovia.uk/record-payment",{
           method:"POST",
           headers:{'Content-Type':'application/json'},
           body:JSON.stringify({productId,orderId:d.orderID})
