@@ -302,8 +302,7 @@
            const token = await currentUser.getIdToken();
 
 const res = await fetch(
-  'https://api.creovia.uk
-/seller-dashboard',
+  'https://api.creovia.uk/seller-dashboard',
   {
     headers: {
       'Authorization': `Bearer ${token}`
@@ -358,8 +357,7 @@ const res = await fetch(
     const token = await currentUser.getIdToken();
 
     const res = await fetch(
-      'https://api.creovia.uk
-/request-payout',
+      'https://api.creovia.uk/request-payout',
       {
         method: 'POST',
         headers: {
