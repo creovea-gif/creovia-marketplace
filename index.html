@@ -881,7 +881,10 @@ const response = await fetch('https://api.creovia.uk/upload', {
                 submitBtn.style.cursor = "pointer";
             }
         });
-        loadProducts();
+       document.addEventListener("DOMContentLoaded", function() {
+    loadProducts();
+});
+
    </script>
    
     <script>
@@ -897,6 +900,7 @@ function goToDashboard() {
     </script>
 </body>
 </html>
+
 
 
 
