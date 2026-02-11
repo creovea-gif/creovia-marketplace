@@ -729,7 +729,13 @@ shareBtn.addEventListener('click', (e) => {
     })
 
 })
-.then(res => res.json())
+.then(res => {
+    if (!res.ok) {
+        throw new Error('Server error ' + res.status);
+    }
+    return res.json();
+})
+
 .then(result => {
 
     console.log("record-payment result:", result);
@@ -888,6 +894,7 @@ function goToDashboard() {
     </script>
 </body>
 </html>
+
 
 
 
