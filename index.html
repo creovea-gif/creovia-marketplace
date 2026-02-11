@@ -737,24 +737,7 @@ shareBtn.addEventListener('click', (e) => {
 
     });
 }
-
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                productId: productId, // يجب أن يكون نفس الـ ID الموجود في Firestore
-                orderId: data.orderID
-            })
-        })
-        .then(res => res.json())
-        .then(result => {
-            if (!result.success) alert('Payment verification failed');
-           else {
-    alert('✅ Payment successful!');
-    loadProducts(); // 🔥 هذا السطر المهم
-    window.location.href = result.downloadUrl;
-}
-
-        });
+ 
     },
     onError: function(err) {
         console.error('PayPal error:', err);
@@ -898,6 +881,7 @@ function goToDashboard() {
     </script>
 </body>
 </html>
+
 
 
 
