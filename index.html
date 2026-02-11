@@ -707,10 +707,37 @@ shareBtn.addEventListener('click', (e) => {
         });
     },
     onApprove: function(data, actions) {
-        // ✅ هنا تأكد أن productId صحيح
-        console.log('Sending payment for productId:', productId); // هذا سيساعدك على تتبع
 
+    // ✅ أولاً: تأكيد الدفع فعلياً في PayPal
+    return actions.order.capture().then(function(details) {
+
+        console.log('Payment captured:', details);
+
+        // ✅ ثم تسجيل الدفع في السيرفر
         return fetch('https://api.creovia.uk/record-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                productId: productId,
+                orderId: data.orderID
+            })
+        })
+        .then(res => res.json())
+        .then(result => {
+
+            if (!result.success) {
+                alert('Payment verification failed');
+            } else {
+                alert('✅ Payment successful!');
+                loadProducts();
+                window.location.href = result.downloadUrl;
+            }
+
+        });
+
+    });
+}
+
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -871,6 +898,7 @@ function goToDashboard() {
     </script>
 </body>
 </html>
+
 
 
 
