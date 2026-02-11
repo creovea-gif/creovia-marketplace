@@ -714,28 +714,36 @@ shareBtn.addEventListener('click', (e) => {
         console.log('Payment captured:', details);
 
         // ✅ ثم تسجيل الدفع في السيرفر
-        return fetch('https://api.creovia.uk/record-payment', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                productId: productId,
-                orderId: data.orderID
-            })
+        return window.currentUser.getIdToken().then(function(token){
+
+    return fetch('https://api.creovia.uk/record-payment', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({
+            productId: productId,
+            orderId: data.orderID
         })
-        .then(res => res.json())
-        .then(result => {
+    })
 
-            if (!result.success) {
-                alert('Payment verification failed');
-            } else {
-                alert('✅ Payment successful!');
-                loadProducts();
-                window.location.href = result.downloadUrl;
-            }
+})
+.then(res => res.json())
+.then(result => {
 
-        });
+    console.log("record-payment result:", result);
 
-    });
+    if (!result.success) {
+        alert('Payment verification failed');
+    } else {
+        alert('✅ Payment successful!');
+        window.location.href = result.downloadUrl;
+    }
+
+});
+
+   
 },
  
     onError: function(err) {
@@ -880,6 +888,7 @@ function goToDashboard() {
     </script>
 </body>
 </html>
+
 
 
 
