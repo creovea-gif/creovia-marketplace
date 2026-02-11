@@ -752,10 +752,14 @@ shareBtn.addEventListener('click', (e) => {
    
 },
  
-    onError: function(err) {
-        console.error('PayPal error:', err);
-        alert('Payment failed. Please try again.');
-    }
+  onError: function(err) {
+
+    console.error("FULL PAYPAL ERROR:", err);
+
+    alert("PayPal error:\n" + JSON.stringify(err, null, 2));
+
+}
+
 }).render(`#paypal-button-${productId}`);
 
 
@@ -894,6 +898,7 @@ function goToDashboard() {
     </script>
 </body>
 </html>
+
 
 
 
