@@ -674,7 +674,7 @@ ${p.pages ? `<div class="seller-name">📄 ${p.pages} pages</div>` : ''}
             🔗 Copy Product Link
         </button>
 
-        <div class="buy-btn-container" id="paypal-button-${productId}"></div>
+       
    
     </div>
 `;
@@ -738,15 +738,19 @@ shareBtn.addEventListener('click', (e) => {
 }).render(`#paypal-button-${productId}`);
 
 const paddleBtn = document.createElement('button');
-    paddleBtn.textContent = 'Buy with Paddle';
-    paddleBtn.className = 'submit-btn';
-    paddleBtn.style.marginTop = '0.8rem';
-    paddleBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        buyProduct(p.id, p.price); // هذه الدالة من كود Paddle أعلاه
+paddleBtn.textContent = 'Buy with Paddle';
+paddleBtn.className = 'submit-btn';
+paddleBtn.style.marginTop = '0.8rem';
+paddleBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    Paddle.Checkout.open({
+        product: p.paddleProductId, // هذا رقم المنتج في Paddle
+        email: window.currentUser ? window.currentUser.email : '',
+        passthrough: JSON.stringify({ productId: p.id }) // نرسل ID المنتج
     });
-    card.querySelector('.buy-btn-container').appendChild(paddleBtn);
 });
+card.querySelector(`#buy-buttons-${productId}`).appendChild(paddleBtn);
+
 
 
                
@@ -882,22 +886,23 @@ function goToDashboard() {
     
   
 
+<script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-
-    // ⚡️ اضبط البيئة على Live
+    // ضبط البيئة
     Paddle.Environment.set("live");
 
-    // ⚡️ ضع هنا Client-side token الصحيح الخاص بك
-    Paddle.Initialize({
-        token: "live_0f78a0c1af6f8e1dc4f7a3e542f", 
+    // إعداد Vendor ID
+    Paddle.Setup({ vendor: 123456 }); // ضع رقم Vendor ID الخاص بك
 
+    // Initialize checkout event listener
+    Paddle.Initialize({
+        token: "live_0f78a0c1af6f8e1dc4f7a3e542f",
         eventCallback: function(event) {
             if (event.name === "checkout.completed") {
-                const productId = event.data.custom_data.productId; // ID المنتج
-                const transactionId = event.data.id; // ID العملية
+                const productId = event.data.custom_data.productId;
+                const transactionId = event.data.id;
 
-                // 🔐 تحقق من الدفع عبر السيرفر
                 fetch("https://api.creovia.uk/record-payment", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -910,15 +915,21 @@ document.addEventListener("DOMContentLoaded", function () {
                 .then(result => {
                     if(result.success){
                         alert("✅ Payment successful!");
-                        window.location.href = result.downloadUrl; // تحميل المنتج
+                        window.location.href = result.downloadUrl;
                     } else {
                         alert("❌ Payment verification failed");
                     }
                 });
+            }
+        }
+    });
+});
+</script>
 
-      </script>
+
 </body>
 </html>
+
 
 
 
