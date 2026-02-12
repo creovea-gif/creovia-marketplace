@@ -11,6 +11,8 @@
     <!-- PayPal JavaScript SDK (Sandbox للتجربة - غيّر إلى Live لاحقاً) -->
     <script src="https://www.paypal.com/sdk/js?client-id=ASrLGoyIz-s5EqwCYGceqrl351wK-BmCjIc8YNUSJc-eK7mQpo7qNdAdqoirebe8TT3g7BqDFnmAo9gj&currency=USD&intent=capture"></script>
 
+    <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
+
 
 
     <!-- Firebase SDK (modular) -->
@@ -735,7 +737,16 @@ shareBtn.addEventListener('click', (e) => {
     }
 }).render(`#paypal-button-${productId}`);
 
-
+const paddleBtn = document.createElement('button');
+    paddleBtn.textContent = 'Buy with Paddle';
+    paddleBtn.className = 'submit-btn';
+    paddleBtn.style.marginTop = '0.8rem';
+    paddleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        buyProduct(p.id, p.price); // هذه الدالة من كود Paddle أعلاه
+    });
+    card.querySelector('.buy-btn-container').appendChild(paddleBtn);
+});
 
 
                
@@ -867,10 +878,48 @@ function goToDashboard() {
     }
 }
 
+        
     
-    </script>
+  
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    // ⚡️ اضبط البيئة على Live
+    Paddle.Environment.set("live");
+
+    // ⚡️ ضع هنا Client-side token الصحيح الخاص بك
+    Paddle.Initialize({
+        token: "live_0f78a0c1af6f8e1dc4f7a3e542f", 
+
+        eventCallback: function(event) {
+            if (event.name === "checkout.completed") {
+                const productId = event.data.custom_data.productId; // ID المنتج
+                const transactionId = event.data.id; // ID العملية
+
+                // 🔐 تحقق من الدفع عبر السيرفر
+                fetch("https://api.creovia.uk/record-payment", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        productId: productId,
+                        orderId: transactionId
+                    })
+                })
+                .then(res => res.json())
+                .then(result => {
+                    if(result.success){
+                        alert("✅ Payment successful!");
+                        window.location.href = result.downloadUrl; // تحميل المنتج
+                    } else {
+                        alert("❌ Payment verification failed");
+                    }
+                });
+
+      </script>
 </body>
 </html>
+
 
 
 
