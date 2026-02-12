@@ -668,6 +668,7 @@ ${p.pages ? `<div class="seller-name">📄 ${p.pages} pages</div>` : ''}
 
         <div class="seller-name" style="margin-top:0.5rem; font-size:0.9rem; color:#6b7280;">By: ${sellerName}</div>
         <div class="buy-btn-container" id="paypal-button-${productId}"></div>
+        <div class="buy-btn-container" id="paddle-button-${productId}"></div>
 
 <!-- زر نسخ الرابط -->
         <button class="share-btn" data-id="${productId}">
@@ -749,7 +750,9 @@ paddleBtn.addEventListener('click', (e) => {
         passthrough: JSON.stringify({ productId: p.id }) // نرسل ID المنتج
     });
 });
-card.querySelector(`#buy-buttons-${productId}`).appendChild(paddleBtn);
+
+// ضع الزر في الـ container الجديد
+card.querySelector(`#paddle-button-${productId}`).appendChild(paddleBtn);
 
 
 
@@ -929,6 +932,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 </body>
 </html>
+
 
 
 
