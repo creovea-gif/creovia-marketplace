@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,9 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- PayPal JavaScript SDK (Sandbox للتجربة - غيّر إلى Live لاحقاً) -->
-    <script src="https://www.paypal.com/sdk/js?client-id=ASrLGoyIz-s5EqwCYGceqrl351wK-BmCjIc8YNUSJc-eK7mQpo7qNdAdqoirebe8TT3g7BqDFnmAo9gj&currency=USD&intent=capture"></script>
-
-    
+    <script src="https://www.paypal.com/sdk/js?client-id=Ady-fs_MNNG5Ue22tNNapD9abvFULboMBDy5vAbpDYt8jCVNkqeyS1hssK58OTIWLWQt5xHxZlcZ_hSB&currency=USD&intent=capture"></script>
 
 
 
@@ -668,14 +665,13 @@ ${p.pages ? `<div class="seller-name">📄 ${p.pages} pages</div>` : ''}
 
         <div class="seller-name" style="margin-top:0.5rem; font-size:0.9rem; color:#6b7280;">By: ${sellerName}</div>
         <div class="buy-btn-container" id="paypal-button-${productId}"></div>
-        <div class="buy-btn-container" id="paddle-button-${productId}"></div>
 
 <!-- زر نسخ الرابط -->
         <button class="share-btn" data-id="${productId}">
             🔗 Copy Product Link
         </button>
 
-       
+        <div class="buy-btn-container" id="paypal-button-${productId}"></div>
    
     </div>
 `;
@@ -738,21 +734,6 @@ shareBtn.addEventListener('click', (e) => {
     }
 }).render(`#paypal-button-${productId}`);
 
-const paddleBtn = document.createElement('button');
-paddleBtn.textContent = 'Buy with Paddle';
-paddleBtn.className = 'submit-btn';
-paddleBtn.style.marginTop = '0.8rem';
-paddleBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    Paddle.Checkout.open({
-        product: p.paddleProductId, // هذا رقم المنتج في Paddle
-        email: window.currentUser ? window.currentUser.email : '',
-        passthrough: JSON.stringify({ productId: p.id }) // نرسل ID المنتج
-    });
-});
-
-// ضع الزر في الـ container الجديد
-card.querySelector(`#paddle-button-${productId}`).appendChild(paddleBtn);
 
 
 
@@ -885,60 +866,10 @@ function goToDashboard() {
     }
 }
 
-        
     
-  
-
-<script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    // ضبط البيئة
-    Paddle.Environment.set("live");
-
-    // إعداد Vendor ID
-    Paddle.Setup({ vendor: 287836 }); // ضع رقم Vendor ID الخاص بك
-
-    // Initialize checkout event listener
-    Paddle.Initialize({
-        token: "live_0f78a0c1af6f8e1dc4f7a3e542f",
-        eventCallback: function(event) {
-            if (event.name === "checkout.completed") {
-                const productId = event.data.custom_data.productId;
-                const transactionId = event.data.id;
-
-                fetch("https://api.creovia.uk/record-payment", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        productId: productId,
-                        orderId: transactionId
-                    })
-                })
-                .then(res => res.json())
-                .then(result => {
-                    if(result.success){
-                        alert("✅ Payment successful!");
-                        window.location.href = result.downloadUrl;
-                    } else {
-                        alert("❌ Payment verification failed");
-                    }
-                });
-            }
-        }
-    });
-});
-</script>
-
-
+    </script>
 </body>
 </html>
-
-
-
-
-
-
-
 
 
 
