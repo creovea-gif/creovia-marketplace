@@ -1,32 +1,47 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>Payment Success</title>
-</head>
-<body>
+<script type="module">
 
-<h2>Processing payment...</h2>
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
-<script>
+const firebaseConfig = { ... };
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
 const params = new URLSearchParams(window.location.search);
-const sessionId = params.get("session_id");
 
-fetch("https://api.creovia.uk/stripe-success",{
-  method:"POST",
-  headers:{
-    "Content-Type":"application/json"
-  },
-  body:JSON.stringify({sessionId})
-})
-.then(res=>res.json())
-.then(data=>{
-  if(data.pdfUrl){
-    window.location.href = data.pdfUrl;
-  }else{
-    document.body.innerHTML = "Payment verification failed";
+const sessionId = params.get("session_id");
+const productId = params.get("productId");
+
+auth.onAuthStateChanged(async (user) => {
+
+  const token = await user.getIdToken();
+
+  const res = await fetch("https://api.creovia.uk/verify-stripe-payment", {
+
+    method: "POST",
+
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token
+    },
+
+    body: JSON.stringify({
+      sessionId,
+      productId
+    })
+
+  });
+
+  const result = await res.json();
+
+  if (result.success) {
+
+    alert("Payment successful");
+
+    window.location.href = result.downloadUrl;
+
   }
+
 });
 </script>
-
-</body>
-</html>
