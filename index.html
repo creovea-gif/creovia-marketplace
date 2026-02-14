@@ -640,7 +640,7 @@ button:hover,
                 const card = document.createElement('div');
                 card.className = 'product-card';
                 card.style.cursor = 'pointer';
-card.querySelector('img').addEventListener('click', () => {
+card.addEventListener('click', () => {
     window.location.href = `product.html?id=${p.id}`;
 });
 
@@ -916,6 +916,7 @@ async function payWithStripe(bookId){
     
 </body>
 </html>
+
 
 
 
