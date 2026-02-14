@@ -667,7 +667,7 @@ ${p.pages ? `<div class="seller-name">📄 ${p.pages} pages</div>` : ''}
 
         <div class="seller-name" style="margin-top:0.5rem; font-size:0.9rem; color:#6b7280;">By: ${sellerName}</div>
         <div class="buy-btn-container" id="paypal-button-${productId}"></div>
-<button class="stripe-btn" data-id="${productId}" style="
+<button type="button" class="stripe-btn" data-id="${productId}" onclick="event.stopPropagation()" style="
 margin-top:8px;
 width:100%;
 padding:10px;
@@ -682,12 +682,13 @@ Pay with Card
 </button>
 
 
+
 <!-- زر نسخ الرابط -->
         <button class="share-btn" data-id="${productId}">
             🔗 Copy Product Link
         </button>
 
-        <div class="buy-btn-container" id="paypal-button-${productId}"></div>
+     
    
     </div>
 `;
@@ -873,7 +874,7 @@ const response = await fetch('https://api.creovia.uk/upload', {
         loadProducts();
    </script>
    
-   <script src="https://js.stripe.com/v3/"></script>
+ 
 
 <script>
 
@@ -883,9 +884,15 @@ const stripe = Stripe("pk_test_51T0hSnHGNLDTT09ZduU9vJWX9it5vbewxDUfGWDLSRI5qotu
 // عند الضغط على زر Stripe
 document.addEventListener("click", async function(e) {
 
-  if (!e.target.classList.contains("stripe-btn")) return;
+  const btn = e.target.closest(".stripe-btn");
 
+  if (!btn) return;
+
+  e.preventDefault();
   e.stopPropagation();
+
+  const productId = btn.dataset.id;
+
 
   const productId = e.target.dataset.id;
 
@@ -937,6 +944,7 @@ function goToDashboard() {
 
 </body>
 </html>
+
 
 
 
