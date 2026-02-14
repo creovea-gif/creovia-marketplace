@@ -2,51 +2,49 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
-const firebaseConfig = { /* ... */ };
+const firebaseConfig = {
+  apiKey: "ضع نفس config",
+  authDomain: "ضع نفس config",
+  projectId: "ضع نفس config",
+  appId: "ضع نفس config"
+};
+
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-const params = new URLSearchParams(window.location.search);
-const sessionId = params.get("session_id");
-const productId = params.get("productId");
+window.onload = async function() {
 
-if (!sessionId || !productId) {
-  alert("Invalid payment session.");
-  window.location.href = "index.html";
-}
+  const urlParams = new URLSearchParams(window.location.search);
+  const sessionId = urlParams.get("session_id");
+  const productId = urlParams.get("productId");
 
-auth.onAuthStateChanged(async (user) => {
+  const user = auth.currentUser;
+
   if (!user) {
-    alert("You must be logged in to verify payment.");
-    window.location.href = "login.html";
+    alert("Login required");
     return;
   }
 
-  try {
-    const token = await user.getIdToken();
+  const token = await user.getIdToken();
 
-    const res = await fetch("https://api.creovia.uk/verify-stripe-payment", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + token
-      },
-      body: JSON.stringify({ sessionId, productId })
-    });
+  const res = await fetch("https://api.creovia.uk/verify-stripe-payment", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token
+    },
+    body: JSON.stringify({
+      sessionId,
+      productId
+    })
+  });
 
-    const result = await res.json();
+  const data = await res.json();
 
-    if (res.ok && result.success) {
-      alert("Payment successful");
-      window.location.href = result.downloadUrl;
-    } else {
-      alert("Payment verification failed");
-      console.error(result);
-    }
-
-  } catch (err) {
-    console.error(err);
-    alert("Could not verify payment. Try again later.");
+  if (data.success) {
+    window.location.href = data.downloadUrl;
+  } else {
+    alert("Stripe verification failed");
   }
-});
+};
 </script>
