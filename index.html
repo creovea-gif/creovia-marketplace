@@ -7,6 +7,7 @@
     <title>CREOVIA - Digital Marketplace</title>
     <link rel="icon" type="image/png" href="assets/logo2.png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://js.stripe.com/v3/"></script>
 
     <!-- PayPal JavaScript SDK (Sandbox للتجربة - غيّر إلى Live لاحقاً) -->
     <script src="https://www.paypal.com/sdk/js?client-id=Ady-fs_MNNG5Ue22tNNapD9abvFULboMBDy5vAbpDYt8jCVNkqeyS1hssK58OTIWLWQt5xHxZlcZ_hSB&currency=USD&intent=capture"></script>
@@ -666,6 +667,20 @@ ${p.pages ? `<div class="seller-name">📄 ${p.pages} pages</div>` : ''}
 
         <div class="seller-name" style="margin-top:0.5rem; font-size:0.9rem; color:#6b7280;">By: ${sellerName}</div>
         <div class="buy-btn-container" id="paypal-button-${productId}"></div>
+<button class="stripe-btn" data-id="${productId}" style="
+margin-top:8px;
+width:100%;
+padding:10px;
+border:none;
+border-radius:8px;
+background:#635bff;
+color:white;
+font-weight:600;
+cursor:pointer;
+">
+Pay with Card
+</button>
+
 
 <!-- زر نسخ الرابط -->
         <button class="share-btn" data-id="${productId}">
@@ -858,7 +873,58 @@ const response = await fetch('https://api.creovia.uk/upload', {
         loadProducts();
    </script>
    
-    <script>
+   <script src="https://js.stripe.com/v3/"></script>
+
+<script>
+
+// ضع Publishable key الخاص بك
+const stripe = Stripe("pk_live_xxxxxxxxx");
+
+// عند الضغط على زر Stripe
+document.addEventListener("click", async function(e) {
+
+  if (!e.target.classList.contains("stripe-btn")) return;
+
+  e.stopPropagation();
+
+  const productId = e.target.dataset.id;
+
+  if (!window.currentUser) {
+    alert("Login required");
+    return;
+  }
+
+  try {
+
+    const token = await window.currentUser.getIdToken();
+
+    const res = await fetch("https://api.creovia.uk/create-stripe-session", {
+
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token
+      },
+
+      body: JSON.stringify({ productId })
+
+    });
+
+    const data = await res.json();
+
+    window.location.href = data.url;
+
+  } catch(err) {
+
+    alert("Stripe error");
+    console.error(err);
+
+  }
+
+});
+
+
 function goToDashboard() {
     if (!window.currentUser) {
         window.location.href = "login.html";
@@ -867,10 +933,11 @@ function goToDashboard() {
     }
 }
 
-    
-    </script>
+</script>
+
 </body>
 </html>
+
 
 
 
