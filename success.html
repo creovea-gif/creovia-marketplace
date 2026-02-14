@@ -1,7 +1,14 @@
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { 
+  getAuth, 
+  onAuthStateChanged 
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+
+/* =========================
+   Firebase Config
+========================= */
 const firebaseConfig = {
   apiKey: "ضع نفس config",
   authDomain: "ضع نفس config",
@@ -12,39 +19,70 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-window.onload = async function() {
-
-  const urlParams = new URLSearchParams(window.location.search);
-  const sessionId = urlParams.get("session_id");
-  const productId = urlParams.get("productId");
-
-  const user = auth.currentUser;
+/* =========================
+   Stripe Success Logic
+========================= */
+onAuthStateChanged(auth, async (user) => {
 
   if (!user) {
-    alert("Login required");
+    alert("You must login first");
     return;
   }
 
-  const token = await user.getIdToken();
+  try {
 
-  const res = await fetch("https://api.creovia.uk/verify-stripe-payment", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer " + token
-    },
-    body: JSON.stringify({
-      sessionId,
-      productId
-    })
-  });
+    // جلب session_id و productId من الرابط
+    const urlParams = new URLSearchParams(window.location.search);
 
-  const data = await res.json();
+    const sessionId = urlParams.get("session_id");
+    const productId = urlParams.get("productId");
 
-  if (data.success) {
-    window.location.href = data.downloadUrl;
-  } else {
-    alert("Stripe verification failed");
+    if (!sessionId || !productId) {
+      alert("Missing payment information");
+      return;
+    }
+
+    // جلب Firebase token
+    const token = await user.getIdToken();
+
+    // إرسال إلى السيرفر
+    const res = await fetch("https://api.creovia.uk/verify-stripe-payment", {
+
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token
+      },
+
+      body: JSON.stringify({
+        sessionId: sessionId,
+        productId: productId
+      })
+
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+
+      // تحميل الكتاب
+      window.location.href = data.downloadUrl;
+
+    } else {
+
+      alert("Payment verification failed");
+
+    }
+
+  } catch (err) {
+
+    console.error(err);
+
+    alert("Error verifying payment");
+
   }
-};
+
+});
+
 </script>
