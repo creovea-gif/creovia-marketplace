@@ -666,6 +666,12 @@ ${p.pages ? `<div class="seller-name">📄 ${p.pages} pages</div>` : ''}
         <div class="seller-name" style="margin-top:0.5rem; font-size:0.9rem; color:#6b7280;">By: ${sellerName}</div>
         <div class="buy-btn-container" id="paypal-button-${productId}"></div>
 
+        <button onclick="payWithStripe('${productId}')" 
+        style="width:100%; margin-top:10px; padding:10px; border:none; border-radius:8px; background:#635bff; color:white; font-weight:600; cursor:pointer;">
+💳 Pay with Card
+</button>
+
+
 <!-- زر نسخ الرابط -->
         <button class="share-btn" data-id="${productId}">
             🔗 Copy Product Link
@@ -867,9 +873,48 @@ function goToDashboard() {
 }
 
     
-    </script>
+  
+
+
+    <script>
+async function payWithStripe(bookId){
+
+  if(!window.currentUser){
+    alert("Please login first");
+    return;
+  }
+
+  try{
+    const res = await fetch("https://api.creovia.uk/create-stripe-session",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({
+        bookId: bookId,
+        userUid: window.currentUser.uid
+      })
+    });
+
+    const data = await res.json();
+
+    if(data.url){
+      window.location.href = data.url;
+    }else{
+      alert("Payment failed");
+    }
+
+  }catch(err){
+    alert("Server error");
+  }
+}
+</script>
+
+    
+    
 </body>
 </html>
+
 
 
 
