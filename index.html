@@ -640,9 +640,10 @@ button:hover,
                 const card = document.createElement('div');
                 card.className = 'product-card';
                 card.style.cursor = 'pointer';
-card.addEventListener('click', () => {
+card.querySelector('img').addEventListener('click', () => {
     window.location.href = `product.html?id=${p.id}`;
 });
+
 
                 const productId = p.id;
                 const price = Number(p.price).toFixed(2);
@@ -666,7 +667,8 @@ ${p.pages ? `<div class="seller-name">📄 ${p.pages} pages</div>` : ''}
         <div class="seller-name" style="margin-top:0.5rem; font-size:0.9rem; color:#6b7280;">By: ${sellerName}</div>
         <div class="buy-btn-container" id="paypal-button-${productId}"></div>
 
-        <button onclick="payWithStripe('${productId}')" 
+       <button onclick="event.stopPropagation(); payWithStripe('${productId}')" 
+
         style="width:100%; margin-top:10px; padding:10px; border:none; border-radius:8px; background:#635bff; color:white; font-weight:600; cursor:pointer;">
 💳 Pay with Card
 </button>
@@ -914,6 +916,7 @@ async function payWithStripe(bookId){
     
 </body>
 </html>
+
 
 
 
