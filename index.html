@@ -642,9 +642,14 @@ button:hover,
                 const card = document.createElement('div');
                 card.className = 'product-card';
                 card.style.cursor = 'pointer';
-card.addEventListener('click', () => {
+card.addEventListener('click', (e) => {
+    // إذا ضغطت على زر داخل البطاقة (button أو .share-btn أو .stripe-btn) لا ننقل للصفحة
+    if (e.target.closest('button')) return;
+
+    // إذا ضغطت في أي مكان آخر من البطاقة، نذهب لصفحة المنتج
     window.location.href = `product.html?id=${p.id}`;
 });
+
 
                 const productId = p.id;
                 const price = Number(p.price).toFixed(2);
@@ -944,6 +949,7 @@ function goToDashboard() {
 
 </body>
 </html>
+
 
 
 
