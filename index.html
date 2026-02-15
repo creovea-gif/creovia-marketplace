@@ -10,7 +10,7 @@
 <script src="https://js.stripe.com/v3/"></script>
 
     <!-- PayPal JavaScript SDK (Sandbox للتجربة - غيّر إلى Live لاحقاً) -->
-    <script src="https://www.paypal.com/sdk/js?client-id=Ady-fs_MNNG5Ue22tNNapD9abvFULboMBDy5vAbpDYt8jCVNkqeyS1hssK58OTIWLWQt5xHxZlcZ_hSB&currency=USD&intent=capture"></script>
+  
 
 
 
@@ -719,42 +719,7 @@ shareBtn.addEventListener('click', (e) => {
 
                 // إنشاء زر PayPal ديناميكي لكل منتج
              
-              paypal.Buttons({
-    createOrder: function(data, actions) {
-        return actions.order.create({
-            purchase_units: [{
-                amount: { value: price },
-            }]
-        });
-    },
-    onApprove: function(data, actions) {
-        // ✅ هنا تأكد أن productId صحيح
-        console.log('Sending payment for productId:', productId); // هذا سيساعدك على تتبع
-
-        return fetch('https://api.creovia.uk/record-payment', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                productId: productId, // يجب أن يكون نفس الـ ID الموجود في Firestore
-                orderId: data.orderID
-            })
-        })
-        .then(res => res.json())
-        .then(result => {
-            if (!result.success) alert('Payment verification failed');
-           else {
-    alert('✅ Payment successful!');
-    loadProducts(); // 🔥 هذا السطر المهم
-    window.location.href = result.downloadUrl;
-}
-
-        });
-    },
-    onError: function(err) {
-        console.error('PayPal error:', err);
-        alert('Payment failed. Please try again.');
-    }
-}).render(`#paypal-button-${productId}`);
+             
 
 
 
@@ -943,6 +908,7 @@ function goToDashboard() {
 
 </body>
 </html>
+
 
 
 
