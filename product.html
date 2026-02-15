@@ -8,6 +8,7 @@
 
 <!-- PayPal SDK -->
 <script src="https://www.paypal.com/sdk/js?client-id=AcD3nRf_MNnJH3SfA3OBdoIOoS-dan5-Q-fIu9_h11UmZ43OqkYwFbdAarKD2jyxYFa25Vj5MzTnpvAw&currency=USD&intent=capture"></script>
+<script src="https://js.stripe.com/v3/"></script>
 
 <style>
 body{
@@ -154,6 +155,24 @@ textarea{
 
   <div id="paypal-button-container"></div>
 
+
+  <button id="stripeBtn" style="
+margin-top:10px;
+width:100%;
+padding:12px;
+border:none;
+border-radius:12px;
+background:#635bff;
+color:white;
+font-weight:600;
+cursor:pointer;
+font-size:16px;
+">
+Pay with Card (Stripe)
+</button>
+
+  
+  
   <hr style="margin:25px 0">
 
   <h2>Reviews</h2>
@@ -290,7 +309,55 @@ submitReview.onclick = async ()=>{
   loadReviews();
 };
 
+
+// ---------- STRIPE ----------
+const stripe = Stripe("pk_live_51T0hRlHz2GFXfewBnwnWsj9PVQOW57sIvbF8r4hebtrkLvX14GlIcPkm73xnBb3k1hzbMt4Ubn0jXeGh4Ppjxfen001gAkJr27"); // ضع publishable key
+
+const stripeBtn = document.getElementById("stripeBtn");
+
+stripeBtn.addEventListener("click", async () => {
+
+  if (!currentUser) {
+    alert("Login required");
+    return;
+  }
+
+  try {
+
+    const token = await currentUser.getIdToken();
+
+    const res = await fetch("https://api.creovia.uk/create-stripe-session", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token
+      },
+      body: JSON.stringify({ productId })
+    });
+
+    const data = await res.json();
+
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      alert("Stripe session failed");
+      console.log(data);
+    }
+
+  } catch (err) {
+    console.error(err);
+    alert("Stripe error");
+  }
+
+});
+
+  
+  
 loadProduct();
 </script>
+
+
+
+  
 </body>
 </html>
