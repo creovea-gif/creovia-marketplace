@@ -7,7 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <!-- PayPal SDK -->
-<script src="https://www.paypal.com/sdk/js?client-id=AcD3nRf_MNnJH3SfA3OBdoIOoS-dan5-Q-fIu9_h11UmZ43OqkYwFbdAarKD2jyxYFa25Vj5MzTnpvAw&currency=USD&intent=capture"></script>
+
 <script src="https://js.stripe.com/v3/"></script>
 
 <style>
@@ -237,21 +237,7 @@ if (product.pages) {
 
     
     // ---------- PAYPAL ----------
-    paypal.Buttons({
-      createOrder: (d,a)=>a.order.create({
-        purchase_units:[{amount:{value:product.price}}]
-      }),
-      onApprove: async (d)=>{
-        const res = await fetch("https://api.creovia.uk/record-payment",{
-          method:"POST",
-          headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({productId,orderId:d.orderID})
-        });
-        const r = await res.json();
-        if(r.success) window.location.href=r.downloadUrl;
-        else alert("Payment failed");
-      }
-    }).render("#paypal-button-container");
+  
 
     loadReviews();
 
